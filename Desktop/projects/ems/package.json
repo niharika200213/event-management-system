@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/niharika200213/eventooze.git"
+    "url": "git+https://github.com/niharika200213/ems.git"
   },
   "author": "niharika",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/niharika200213/eventooze/issues"
+    "url": "https://github.com/niharika200213/ems/issues"
   },
-  "homepage": "https://github.com/niharika200213/eventooze#readme",
+  "homepage": "https://github.com/niharika200213/ems#readme",
   "dependencies": {
     "axios": "^0.24.0",
     "bcryptjs": "^2.4.3",
