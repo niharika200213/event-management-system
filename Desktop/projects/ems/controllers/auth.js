@@ -53,7 +53,7 @@ exports.verifyOtp = (req, res, next) => {
   User.findOne({ email: email })
   .then(user => {
     if (user) {
-      return res.status(401).send('Already verified.');
+      return res.status(400).send('Already verified.');
     }
     else{
       return OTP.findOne({ "email": email }).then(otpHolder =>{

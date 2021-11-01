@@ -39,3 +39,4 @@ mongoose
 
 app.use('/auth',authRoutes);
 app.use('/post',userRoutes);
+app.get('/', function (req,res){res.send('ok')});

@@ -74,7 +74,7 @@ exports.resetpass = (req, res, next) => {
       else{
           return bcrypt.compare(otp, optInDb.otp).then(isEqual => {
           if (!isEqual) {
-            return res.status(401).json('wrong otp');
+            return res.status(400).json('wrong otp');
           }
           else{
             return bcrypt.hash(newpass, 12).then(hashedPw => {
