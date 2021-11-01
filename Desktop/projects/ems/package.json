@@ -24,6 +24,7 @@
     "config": "^3.3.6",
     "connect-flash": "^0.1.1",
     "connect-mongodb-session": "^3.1.1",
+    "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "csurf": "^1.11.0",
     "dotenv": "^10.0.0",

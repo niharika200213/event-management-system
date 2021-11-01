@@ -14,6 +14,8 @@ require('dotenv/config');
 const User = require('../models/user');
 const OTP = require('../models/OTP');
 
+let email, password, name;
+
 exports.generate_otp = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -23,7 +25,9 @@ exports.generate_otp = (req, res, next) => {
     throw error;
   }
 
-  const email = req.body.email;
+  email = req.body.email;
+  name = req.body.name;
+  password = req.body.password;
   const otp=otpgenerator.generate(6, {digits:true, alphabets:false,
     upperCase:false, specialChars:false});
 
@@ -47,9 +51,6 @@ exports.generate_otp = (req, res, next) => {
 
 exports.verifyOtp = (req, res, next) => {
   const otp = req.body.otp;
-  const email = req.body.email;
-  const name = req.body.name;
-  const password = req.body.password;
   User.findOne({ email: email })
   .then(user => {
     if (user) {
