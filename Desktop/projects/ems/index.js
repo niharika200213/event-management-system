@@ -5,6 +5,7 @@ require('dotenv/config');
 
 const feedRoutes = require('./routes/eventposts');
 const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/eventposts');
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
@@ -37,3 +38,4 @@ mongoose
 
 
 app.use('/auth',authRoutes);
+app.use('/post',userRoutes);

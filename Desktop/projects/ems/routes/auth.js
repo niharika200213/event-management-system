@@ -30,7 +30,8 @@ router.put(
       .trim()
       .not()
       .isEmpty()
-      .isAlphanumeric() 
+      .isAlphanumeric()
+      .withMessage('please enter your name') 
   ],
   authController.generate_otp
 );
@@ -38,7 +39,14 @@ router.put(
 router.put('/signup/verify', authController.verifyOtp);
 
 router.put('/login', authController.login);
-router.put('/resetpass', isAuth, passcontroller.resetpass);
+
+router.put('/resetpass', [
+  body('newpass')
+  .trim()
+  .isLength({ min: 8 })
+  .withMessage('Password should have atleast 8 characters.')
+], isAuth, passcontroller.resetpass);
+
 router.put('/resetpass/verify', isAuth, passcontroller.verify);
 
 module.exports = router;

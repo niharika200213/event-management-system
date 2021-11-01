@@ -28,7 +28,7 @@ exports.generate_otp = (req, res, next) => {
     upperCase:false, specialChars:false});
 
       bcrypt.hash(otp, 12).then(hashed_otp => {
-        OTP.findOne({email: email}).then(result => {
+        return OTP.findOne({email: email}).then(result => {
           if(result===null){
             const newOtp= new OTP({email: email, otp: hashed_otp});
             return newOtp.save();
@@ -56,14 +56,14 @@ exports.verifyOtp = (req, res, next) => {
       return res.status(401).send('Already verified.');
     }
     else{
-      OTP.findOne({ "email": email }).then(otpHolder =>{
+      return OTP.findOne({ "email": email }).then(otpHolder =>{
         if(otpHolder===null)
           return res.status(400).send('otp expired');
         else 
-          bcrypt.compare(otp, otpHolder.otp).then(validUser => {
+          return bcrypt.compare(otp, otpHolder.otp).then(validUser => {
           if(otpHolder.email===email && validUser){
     
-            bcrypt.hash(password, 12).then(hashedPw => {
+            return bcrypt.hash(password, 12).then(hashedPw => {
               const user = new User({
                 email: email,
                 password: hashedPw,
@@ -104,7 +104,7 @@ exports.login = (req, res, next) => {
         return res.status(400).send('A user with this email could not be found.');
       }
       loadedUser = user;
-      bcrypt.compare(password, user.password).then(isEqual => {
+      return bcrypt.compare(password, user.password).then(isEqual => {
       if (!isEqual) {
         return res.status(400).send('wrong password');
       }

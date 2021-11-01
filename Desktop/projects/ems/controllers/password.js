@@ -1,5 +1,6 @@
 
 const bcrypt = require('bcryptjs');
+const { validationResult } = require('express-validator');
 const nodemailer=require('nodemailer');
 const sendgridTransport=require('nodemailer-sendgrid-transport');
 const otpgenerator=require('otp-generator'); 
@@ -13,6 +14,15 @@ const User = require('../models/user');
 const OTP = require('../models/OTP');
 
 exports.resetpass = (req, res, next) => {
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error('Validation failed.');
+    error.statusCode = 422;
+    error.data = errors.array();
+    throw error;
+  }
+
   const email = req.body.email;
   User.findOne({ email: email })
   .then(user => {
@@ -24,7 +34,7 @@ exports.resetpass = (req, res, next) => {
         upperCase:false, specialChars:false});
     
           bcrypt.hash(otp, 12).then(hashed_otp => {
-            OTP.findOne({email: email}).then(result => {
+            return OTP.findOne({email: email}).then(result => {
               if(result===null){
                 const newOtp= new OTP({email: email, otp: hashed_otp});
                 return newOtp.save();
@@ -57,17 +67,18 @@ exports.resetpass = (req, res, next) => {
       return res.status(400).send('User not found');
     }
     else
-    { OTP.findOne({email: email}).then(optInDb => {
+    { 
+      return OTP.findOne({email: email}).then(optInDb => {
       if(optInDb===null)
         return res.status(400).send('otp expired');
       else{
-          bcrypt.compare(otp, optInDb.otp).then(isEqual => {
+          return bcrypt.compare(otp, optInDb.otp).then(isEqual => {
           if (!isEqual) {
             return res.status(401).json('wrong otp');
           }
           else{
-            bcrypt.hash(newpass, 12).then(hashedPw => {
-              User.updateOne({email:email}, {$set: { password : hashedPw}}).then(user=>{
+            return bcrypt.hash(newpass, 12).then(hashedPw => {
+              return User.updateOne({email:email}, {$set: { password : hashedPw}}).then(user=>{ 
                 return res.status(200).json('password updated');
               });
             });
