@@ -7,5 +7,5 @@ const Post = require('../models/events');
 const User = require('../models/user');
 
 exports.createPosts = (req,res,next) => {
-
+    
 };

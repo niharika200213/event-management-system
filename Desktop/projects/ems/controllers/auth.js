@@ -131,9 +131,15 @@ exports.adminLogin = (req,res,next) => {
   const password = req.body.password;
 
   if(email==='eventooze@gmail.com'){
-
+        if (password===process.env.ADMIN_PASS.toString()) {
+          const token = jwt.sign({
+            email:email, userId:process.env.ADMIN_ID
+          }, process.env.JWT_KEY, {expiresIn: '3h'});
+          return res.status(200).json({token: token, userId: process.env.ADMIN_ID});
+        }
+        else
+          return res.status(401).send('wrong password');
   }
-
   else
-    return res.status(400).send('this email does not belong to the admmin');
+    return res.status(400).send('this email does not belong to the admin');
 };

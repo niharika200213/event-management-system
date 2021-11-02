@@ -13,6 +13,8 @@ const transporter=nodemailer.createTransport(sendgridTransport({
 const User = require('../models/user');
 const OTP = require('../models/OTP');
 
+let email;
+
 exports.resetpass = (req, res, next) => {
 
   const errors = validationResult(req);
@@ -22,7 +24,7 @@ exports.resetpass = (req, res, next) => {
     return res.status(422).json({errors: extractedErrors});
   }
 
-  const email = req.body.email;
+  email = req.body.email;
   User.findOne({ email: email })
   .then(user => {
     if (user===null) {
@@ -58,15 +60,8 @@ exports.resetpass = (req, res, next) => {
   };
 
   exports.verify = (req, res, next) => {
-    const email = req.body.email;
     const newpass=req.body.newpass;
     const otp = req.body.otp;
-    User.findOne({ email: email }).then(user => {
-    if (user===null) {
-      return res.status(400).send('User not found');
-    }
-    else
-    { 
       return OTP.findOne({email: email}).then(optInDb => {
       if(optInDb===null)
         return res.status(401).send('otp expired');
@@ -84,6 +79,5 @@ exports.resetpass = (req, res, next) => {
           }
         });
       }
-      });}
     });
   };
