@@ -17,10 +17,9 @@ exports.resetpass = (req, res, next) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const error = new Error('Validation failed.');
-    error.statusCode = 422;
-    error.data = errors.array();
-    throw error;
+    const extractedErrors = [];
+    errors.array().map(err => extractedErrors.push({ [err.param]: err.msg }));
+    return res.status(422).json({errors: extractedErrors});
   }
 
   const email = req.body.email;
@@ -70,11 +69,11 @@ exports.resetpass = (req, res, next) => {
     { 
       return OTP.findOne({email: email}).then(optInDb => {
       if(optInDb===null)
-        return res.status(400).send('otp expired');
+        return res.status(401).send('otp expired');
       else{
           return bcrypt.compare(otp, optInDb.otp).then(isEqual => {
           if (!isEqual) {
-            return res.status(400).json('wrong otp');
+            return res.status(402).json('wrong otp');
           }
           else{
             return bcrypt.hash(newpass, 12).then(hashedPw => {

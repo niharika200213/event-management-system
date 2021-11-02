@@ -19,15 +19,17 @@ let email, password, name;
 exports.generate_otp = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const error = new Error('Validation failed.');
-    error.statusCode = 422;
-    error.data = errors.array();
-    throw error;
+    const extractedErrors = [];
+    errors.array().map(err => extractedErrors.push({ [err.param]: err.msg }));
+    return res.status(422).json({errors: extractedErrors});
   }
 
   email = req.body.email;
   name = req.body.name;
   password = req.body.password;
+  console.log(email);
+  console.log(password);
+  console.log(name);
   const otp=otpgenerator.generate(6, {digits:true, alphabets:false,
     upperCase:false, specialChars:false});
 
@@ -59,7 +61,7 @@ exports.verifyOtp = (req, res, next) => {
     else{
       return OTP.findOne({ "email": email }).then(otpHolder =>{
         if(otpHolder===null)
-          return res.status(400).send('otp expired');
+          return res.status(401).send('otp expired');
         else 
           return bcrypt.compare(otp, otpHolder.otp).then(validUser => {
           if(otpHolder.email===email && validUser){
@@ -83,7 +85,7 @@ exports.verifyOtp = (req, res, next) => {
             });
           }
           else
-            return res.status(400).send('wrong otp');
+            return res.status(402).send('wrong otp');
         });
       })
     }
@@ -107,7 +109,7 @@ exports.login = (req, res, next) => {
       loadedUser = user;
       return bcrypt.compare(password, user.password).then(isEqual => {
       if (!isEqual) {
-        return res.status(400).send('wrong password');
+        return res.status(401).send('wrong password');
       }
       else{
         const token = jwt.sign({
@@ -122,4 +124,16 @@ exports.login = (req, res, next) => {
       }
       next(err);
     });
+};
+
+exports.adminLogin = (req,res,next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  if(email==='eventooze@gmail.com'){
+
+  }
+
+  else
+    return res.status(400).send('this email does not belong to the admmin');
 };

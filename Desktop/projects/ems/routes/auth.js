@@ -2,7 +2,6 @@ const express = require('express');
 const { body } = require('express-validator');
 
 const User = require('../models/user');
-const isAuth = require('../middleware/is-auth');
 const authController = require('../controllers/auth');
 const passcontroller = require('../controllers/password');
 
@@ -14,24 +13,25 @@ router.put(
     body('email')
       .isEmail()
       .withMessage('Please enter a valid email.')
-      .custom((value, { req }) => {
+      .custom((value, { res }) => {
         return User.findOne({ email: value }).then(userDoc => {
           if (userDoc) {
-            return Promise.reject('E-Mail address already exists!');
+            return Promise.reject();
           }
         }); 
       })
+      .withMessage('E-Mail address already exists!')
       .normalizeEmail(),
     body('password')
       .trim()
       .isLength({ min: 8 })
-      .withMessage('Password should have atleast 8 characters.'),
+      .withMessage({message: 'Password should have atleast 8 characters.'}),
     body('name')
       .trim()
       .not()
       .isEmpty()
       .isAlphanumeric()
-      .withMessage('please enter your name') 
+      .withMessage({message: 'please enter a valid name'}) 
   ],
   authController.generate_otp
 );
@@ -40,13 +40,15 @@ router.put('/signup/verify', authController.verifyOtp);
 
 router.put('/login', authController.login);
 
+router.put('/adminLogin', authController.adminLogin);
+
 router.put('/resetpass', [
   body('newpass')
   .trim()
   .isLength({ min: 8 })
-  .withMessage('Password should have atleast 8 characters.')
-], isAuth, passcontroller.resetpass);
+  .withMessage({message: 'Password should have atleast 8 characters.'})
+], passcontroller.resetpass);
 
-router.put('/resetpass/verify', isAuth, passcontroller.verify);
+router.put('/resetpass/verify', passcontroller.verify);
 
 module.exports = router;
