@@ -1,4 +1,3 @@
-const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer=require('nodemailer');
@@ -17,19 +16,10 @@ const OTP = require('../models/OTP');
 let email, password, name;
 
 exports.generate_otp = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const extractedErrors = [];
-    errors.array().map(err => extractedErrors.push({ [err.param]: err.msg }));
-    return res.status(422).json({errors: extractedErrors});
-  }
 
   email = req.body.email;
   name = req.body.name;
   password = req.body.password;
-  console.log(email);
-  console.log(password);
-  console.log(name);
   const otp=otpgenerator.generate(6, {digits:true, alphabets:false,
     upperCase:false, specialChars:false});
 

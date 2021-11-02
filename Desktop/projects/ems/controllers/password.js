@@ -1,6 +1,5 @@
 
 const bcrypt = require('bcryptjs');
-const { validationResult } = require('express-validator');
 const nodemailer=require('nodemailer');
 const sendgridTransport=require('nodemailer-sendgrid-transport');
 const otpgenerator=require('otp-generator'); 
@@ -16,13 +15,6 @@ const OTP = require('../models/OTP');
 let email;
 
 exports.resetpass = (req, res, next) => {
-
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const extractedErrors = [];
-    errors.array().map(err => extractedErrors.push({ [err.param]: err.msg }));
-    return res.status(422).json({errors: extractedErrors});
-  }
 
   email = req.body.email;
   User.findOne({ email: email })

@@ -1,5 +1,6 @@
 const express = require('express');
 const { body } = require('express-validator');
+const { validationResult } = require('express-validator');
 
 const User = require('../models/user');
 const authController = require('../controllers/auth');
@@ -12,26 +13,29 @@ router.put(
   [
     body('email')
       .isEmail()
-      .withMessage('Please enter a valid email.')
-      .custom((value, { res }) => {
-        return User.findOne({ email: value }).then(userDoc => {
-          if (userDoc) {
-            return Promise.reject();
-          }
-        }); 
+      .withMessage('please enter a valid email')
+      .custom(async (value, { res }) => {
+        const userDoc = await User.findOne({ email: value });
+        if (userDoc)
+          return res.status(422).json('user already exists');
       })
-      .withMessage('E-Mail address already exists!')
+      .withMessage('user already exists')
       .normalizeEmail(),
     body('password')
       .trim()
       .isLength({ min: 8 })
-      .withMessage({message: 'Password should have atleast 8 characters.'}),
+      .withMessage('password must be atleast 8 characters long'),
     body('name')
       .trim()
       .not()
       .isEmpty()
+      .withMessage('please enter your name')
       .isAlphanumeric()
-      .withMessage({message: 'please enter a valid name'}) 
+      .withMessage('please enter a valid name'),
+      (req,res)=>{
+        if(!validationResult(req).isEmpty())
+          return res.status(422).json(validationResult(req).errors[0].msg);
+      }
   ],
   authController.generate_otp
 );
@@ -47,8 +51,11 @@ router.put('/resetpass', passcontroller.resetpass);
 router.put('/resetpass/verify', [
   body('newpass')
   .trim()
-  .isLength({ min: 8 })
-  .withMessage({message: 'Password should have atleast 8 characters.'})
+  .isLength({ min: 8 }),
+  (req,res)=>{
+    if(!validationResult(req).isEmpty())
+      return res.status(422).json('password must be atleast 8 characters long');
+  }
 ], passcontroller.verify);
 
 module.exports = router;
