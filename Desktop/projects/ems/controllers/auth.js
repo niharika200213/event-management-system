@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer=require('nodemailer');
 const sendgridTransport=require('nodemailer-sendgrid-transport');
+const { validationResult } = require('express-validator');
 const otpgenerator=require('otp-generator'); 
 
 const transporter=nodemailer.createTransport(sendgridTransport({
@@ -16,6 +17,8 @@ const OTP = require('../models/OTP');
 let email, password, name;
 
 exports.generate_otp = (req, res, next) => {
+    if(!validationResult(req).isEmpty())
+      return res.status(422).json(validationResult(req).errors[0].msg);
 
   email = req.body.email;
   name = req.body.name;
@@ -69,7 +72,7 @@ exports.verifyOtp = (req, res, next) => {
                 }, process.env.JWT_KEY, {expiresIn: '3h'});
 
                 OTP.deleteMany({email:email}).then(response=>{
-                  res.status(200).json({token: token, userId: result._id.toString()}); 
+                  res.status(201).json({token: token, userId: result._id.toString()}); 
                 });
               });
             });

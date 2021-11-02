@@ -1,6 +1,5 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { validationResult } = require('express-validator');
 
 const User = require('../models/user');
 const authController = require('../controllers/auth');
@@ -31,11 +30,7 @@ router.put(
       .isEmpty()
       .withMessage('please enter your name')
       .isAlphanumeric()
-      .withMessage('please enter a valid name'),
-      (req,res)=>{
-        if(!validationResult(req).isEmpty())
-          return res.status(422).json(validationResult(req).errors[0].msg);
-      }
+      .withMessage('please enter a valid name')
   ],
   authController.generate_otp
 );
@@ -51,11 +46,7 @@ router.put('/resetpass', passcontroller.resetpass);
 router.put('/resetpass/verify', [
   body('newpass')
   .trim()
-  .isLength({ min: 8 }),
-  (req,res)=>{
-    if(!validationResult(req).isEmpty())
-      return res.status(422).json('password must be atleast 8 characters long');
-  }
+  .isLength({ min: 8 })
 ], passcontroller.verify);
 
 module.exports = router;

@@ -2,6 +2,7 @@
 const bcrypt = require('bcryptjs');
 const nodemailer=require('nodemailer');
 const sendgridTransport=require('nodemailer-sendgrid-transport');
+const { validationResult } = require('express-validator');
 const otpgenerator=require('otp-generator'); 
 require('dotenv/config');
 
@@ -15,7 +16,8 @@ const OTP = require('../models/OTP');
 let email;
 
 exports.resetpass = (req, res, next) => {
-
+    if(!validationResult(req).isEmpty())
+      return res.status(422).json('password must be atleast 8 characters long');
   email = req.body.email;
   User.findOne({ email: email })
   .then(user => {

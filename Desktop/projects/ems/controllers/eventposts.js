@@ -9,5 +9,5 @@ exports.createPosts = (req,res,next) => {
         imageUrl:req.file.path,
         content:req.body.content
     });
-    newPost.save();
+    return newPost.save();
 };
