@@ -2,9 +2,9 @@ const express=require('express');
 const app=express();
 const cors=require('cors');
 const mongoose=require('mongoose');
+const fileUpload = require('express-fileupload');
 require('dotenv/config');
 
-const feedRoutes = require('./routes/eventposts');
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/eventposts');
 
@@ -24,6 +24,8 @@ app.use((error, req, res, next) => {
   const data = error.data;
   res.status(status).json({ message: message, data: data });
 });
+
+app.use(fileUpload());
 
 mongoose
   .connect(

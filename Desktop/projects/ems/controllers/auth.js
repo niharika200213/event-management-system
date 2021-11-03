@@ -14,47 +14,47 @@ require('dotenv/config');
 const User = require('../models/user');
 const OTP = require('../models/OTP');
 
-let email, password, name;
-
 exports.generate_otp = (req, res, next) => {
     if(!validationResult(req).isEmpty())
       return res.status(422).json(validationResult(req).errors[0].msg);
 
-  email = req.body.email;
-  name = req.body.name;
-  password = req.body.password;
+  const email = req.body.email;
+  const name = req.body.name;
+  const password = req.body.password;
   const otp=otpgenerator.generate(6, {digits:true, alphabets:false,
     upperCase:false, specialChars:false});
 
-      bcrypt.hash(otp, 12).then(hashed_otp => {
-        return OTP.findOne({email: email}).then(result => {
-          if(result===null){
-            const newOtp= new OTP({email: email, otp: hashed_otp});
-            return newOtp.save();
-          }
-          else
-            return OTP.updateOne({email: email}, {$set: {otp: hashed_otp}});
-      });
+      bcrypt.hash(otp, 12).then(async hashed_otp => {
+        const result = await OTP.findOne({ email: email });
+        if (result === null) {
+          const newOtp = new OTP({ email: email, otp: hashed_otp });
+          const newotp = await newOtp.save(); return newotp;
+        }
+        else
+          return OTP.updateOne({ email: email }, { $set: { otp: hashed_otp } });
     });
   
     transporter.sendMail({
       to: email, from: 'eventooze@gmail.com',
       subject: 'Verify', html: `<h1>OTP IS HERE: ${otp}</h1>`
     });
-  res.status(200).send('otp sent successfully');
+  return res.status(200).send('otp sent successfully');
 };
 
-exports.verifyOtp = (req, res, next) => {
+exports.verifyOtp = async (req, res, next) => {
+  const email = req.body.email;
+  const name = req.body.name;
+  const password = req.body.password;
   const otp = req.body.otp;
-  User.findOne({ email: email })
+  await User.findOne({ email: email })
   .then(user => {
     if (user) {
-      return res.status(400).send('Already verified.');
+      return res.status(401).send('Already verified.');
     }
     else{
-      return OTP.findOne({ "email": email }).then(otpHolder =>{
+      return OTP.findOne({ email: email }).then(otpHolder =>{
         if(otpHolder===null)
-          return res.status(401).send('otp expired');
+          return res.status(402).send('otp expired');
         else 
           return bcrypt.compare(otp, otpHolder.otp).then(validUser => {
           if(otpHolder.email===email && validUser){
@@ -66,19 +66,18 @@ exports.verifyOtp = (req, res, next) => {
                 name: name,
                 isVarified: true
               });
-              return user.save().then(result=>{
+              user.save().then(async result=>{
                 const token = jwt.sign({
                 email:result.email, userId:result._id.toString()
                 }, process.env.JWT_KEY, {expiresIn: '3h'});
 
-                OTP.deleteMany({email:email}).then(response=>{
-                  res.status(201).json({token: token, userId: result._id.toString()}); 
-                });
+                const response = await OTP.deleteMany({ email: email });
+                return res.status(201).json({ token: token, userId: result._id.toString() });
               });
             });
           }
           else
-            return res.status(402).send('wrong otp');
+            return res.status(403).send('wrong otp');
         });
       })
     }
@@ -97,7 +96,7 @@ exports.login = (req, res, next) => {
   let loadedUser;
   User.findOne({ email: email }).then(user => {
       if (!user) {
-        return res.status(400).send('A user with this email could not be found.');
+        return res.status(401).send('A user with this email could not be found.');
       }
       loadedUser = user;
       return bcrypt.compare(password, user.password).then(isEqual => {
@@ -134,5 +133,5 @@ exports.adminLogin = (req,res,next) => {
           return res.status(401).send('wrong password');
   }
   else
-    return res.status(400).send('this email does not belong to the admin');
+    return res.status(401).send('this email does not belong to the admin');
 };

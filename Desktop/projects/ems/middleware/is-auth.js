@@ -4,7 +4,7 @@ require('dotenv/config');
 module.exports = (req, res, next) => {
   const authHeader = req.get('Authorization');
   if (!authHeader) {
-    return res.status(400).send('Not authenticated.');
+    return res.status(401).send('Not authenticated.');
   }
   const token = authHeader.split(' ')[1];
   let decodedToken;
@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
     return res.status(500).send(err);
   }
   if (!decodedToken) {
-    return res.status(400).send('Not authenticated.');
+    return res.status(402).send('Not authenticated.');
   }
   next();
 };

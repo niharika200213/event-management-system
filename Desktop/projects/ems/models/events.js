@@ -15,8 +15,12 @@ const eventSchema = new Schema(
       type: String,
       required: true
     },
+    category: {
+      type: String,
+      required: true
+    },
     creator: {
-      type: Schema.Types.ObjectId,
+      type: Object,
       ref: 'User',
       required: true
     },

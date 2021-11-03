@@ -22,7 +22,7 @@ exports.resetpass = (req, res, next) => {
   User.findOne({ email: email })
   .then(user => {
     if (user===null) {
-      return res.status(400).send('User not found');
+      return res.status(401).send('User not found');
     }
     else{
       const otp=otpgenerator.generate(6, {digits:true, alphabets:false,
