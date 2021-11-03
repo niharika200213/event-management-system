@@ -101,7 +101,7 @@ exports.login = (req, res, next) => {
       loadedUser = user;
       return bcrypt.compare(password, user.password).then(isEqual => {
       if (!isEqual) {
-        return res.status(401).send('wrong password');
+        return res.status(402).send('wrong password');
       }
       else{
         const token = jwt.sign({
@@ -133,5 +133,5 @@ exports.adminLogin = (req,res,next) => {
           return res.status(401).send('wrong password');
   }
   else
-    return res.status(401).send('this email does not belong to the admin');
+    return res.status(402).send('this email does not belong to the admin');
 };

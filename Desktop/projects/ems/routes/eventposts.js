@@ -6,9 +6,7 @@ const User = require('../models/user');
 const isAuth = require('../middleware/is-auth');
 
 const eventController = require('../controllers/eventposts');
-const fileUpload = require('express-fileupload');
-router.use(fileUpload());
 
-router.post('/create', eventController.createPosts);
+router.post('/create', isAuth,eventController.createPosts);
 
 module.exports=router;

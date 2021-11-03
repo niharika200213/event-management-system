@@ -1,12 +1,15 @@
 const express=require('express');
 const app=express();
+const path = require('path');
 const cors=require('cors');
 const mongoose=require('mongoose');
-const fileUpload = require('express-fileupload');
+const multer = require('multer');
 require('dotenv/config');
+const helpers = require('./middleware/helpers');
 
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/eventposts');
+const isAuth = require('./middleware/is-auth');
 
 app.use(express.json());
 
@@ -25,7 +28,7 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message: message, data: data });
 });
 
-app.use(fileUpload());
+app.use('/images',express.static(__dirname + '/images'));
 
 mongoose
   .connect(
