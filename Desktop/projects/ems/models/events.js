@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const User = require('./user');
 
 const eventSchema = new Schema(
   {
@@ -8,8 +9,7 @@ const eventSchema = new Schema(
       required: true
     },
     imageUrl: {
-      type: String,
-      required: true
+      type: String
     },
     content: {
       type: String,
@@ -20,7 +20,7 @@ const eventSchema = new Schema(
       required: true
     },
     creator: {
-      type: Object,
+      type: Schema.Types.ObjectId,
       ref: 'User',
       required: true
     },

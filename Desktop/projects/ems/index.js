@@ -1,11 +1,8 @@
 const express=require('express');
 const app=express();
-const path = require('path');
 const cors=require('cors');
 const mongoose=require('mongoose');
-const multer = require('multer');
 require('dotenv/config');
-const helpers = require('./middleware/helpers');
 
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/eventposts');
@@ -28,7 +25,7 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message: message, data: data });
 });
 
-app.use('/images',express.static(__dirname + '/images'));
+app.use('/post/upload',express.static(__dirname + '/images'));
 
 mongoose
   .connect(
@@ -37,7 +34,7 @@ mongoose
   )
   .then(result => {
     console.log('connection established');
-    app.listen(3000);
+    app.listen(8080);
   })
   .catch(err => console.log(err));
 

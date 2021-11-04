@@ -63,8 +63,7 @@ exports.verifyOtp = async (req, res, next) => {
               const user = new User({
                 email: email,
                 password: hashedPw,
-                name: name,
-                isVarified: true
+                name: name
               });
               user.save().then(async result=>{
                 const token = jwt.sign({

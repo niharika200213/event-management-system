@@ -13,12 +13,8 @@ const transporter=nodemailer.createTransport(sendgridTransport({
 const User = require('../models/user');
 const OTP = require('../models/OTP');
 
-let email;
-
 exports.resetpass = (req, res, next) => {
-    if(!validationResult(req).isEmpty())
-      return res.status(422).json('password must be atleast 8 characters long');
-  email = req.body.email;
+  const email = req.body.email;
   User.findOne({ email: email })
   .then(user => {
     if (user===null) {
@@ -53,25 +49,51 @@ exports.resetpass = (req, res, next) => {
       });
   };
 
-  exports.verify = (req, res, next) => {
-    const newpass=req.body.newpass;
-    const otp = req.body.otp;
-      return OTP.findOne({email: email}).then(optInDb => {
-      if(optInDb===null)
-        return res.status(401).send('otp expired');
-      else{
-          return bcrypt.compare(otp, optInDb.otp).then(isEqual => {
-          if (!isEqual) {
-            return res.status(402).json('wrong otp');
-          }
-          else{
-            return bcrypt.hash(newpass, 12).then(hashedPw => {
-              return User.updateOne({email:email}, {$set: { password : hashedPw}}).then(user=>{ 
-                return res.status(200).json('password updated');
-              });
+exports.verify = async (req, res) => {
+  const email = req.body.email;
+  const otp = req.body.otp;
+  const optInDb = await OTP.findOne({ email: email });
+  if (optInDb === null)
+    return res.status(401).send('otp expired');
+  else {
+    return bcrypt.compare(otp, optInDb.otp).then(async isEqual => {
+      if (!isEqual) {
+        return res.status(402).json('wrong otp');
+      }
+      else {
+        await User.updateOne({email:email},{$set:{isVerified:true}});
+        return res.status(200).json('correct otp');
+    }
+  });
+  }
+};
+
+exports.newpassword = (req,res,next) => {
+  if(!validationResult(req).isEmpty())
+      return res.status(422).json('password must be atleast 8 characters long');
+  const newpass = req.body.newpass;
+  const email = req.body.email;
+  OTP.findOne({email:email}).then(async otp=>{
+    if(otp===null){
+      await User.updateOne({email:email}, {$set:{isVerified:false}});
+      return res.status(403).send('session expired');
+    }
+    else{
+      User.findOne({email:email}).then(user => {
+        if(user===null)
+          return res.status(401).send('User not found');
+        else{
+          if(user.isVerified)
+          {
+            bcrypt.hash(newpass, 12).then(async hashedPw => {
+              await User.updateOne({ email: email }, { $set: {password:hashedPw,isVerified:false} });
+              return res.status(200).json('password updated');
             });
           }
-        });
-      }
-    });
-  };
+          else
+            return res.status(402).send('user not verified please enter otp');
+        }
+      });
+    }
+  });
+};

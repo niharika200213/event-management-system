@@ -43,10 +43,13 @@ router.put('/adminLogin', authController.adminLogin);
 
 router.put('/resetpass', passcontroller.resetpass);
 
-router.put('/resetpass/verify', [
+router.put('/resetpass/verify', passcontroller.verify);
+
+router.put('/resetpass/verify/newpass', [
   body('newpass')
   .trim()
   .isLength({ min: 8 })
-], passcontroller.verify);
+  .withMessage('password must be atleast 8 characters long')
+], passcontroller.newpassword);
 
 module.exports = router;

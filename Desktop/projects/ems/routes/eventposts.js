@@ -7,6 +7,7 @@ const isAuth = require('../middleware/is-auth');
 
 const eventController = require('../controllers/eventposts');
 
-router.post('/create', isAuth,eventController.createPosts);
+router.post('/create', isAuth, eventController.createPosts);
+router.post('/create/upload', isAuth, eventController.uploadImages);
 
 module.exports=router;

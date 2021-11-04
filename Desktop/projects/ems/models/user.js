@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-require('dotenv/config');
-const jwt = require('jsonwebtoken');
-const { Timestamp } = require('bson');
+const event = require('./events');
 
 const userSchema = new Schema({
   email: {
@@ -18,8 +16,9 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
-  isVarified: {
-    type: Boolean
+  isVerified: {
+    type: Boolean,
+    default: false
   },
   event: [
     {
