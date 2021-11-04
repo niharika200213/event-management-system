@@ -31,6 +31,7 @@ exports.uploadImages = (req,res,next) => {
 };
 
 exports.createPosts = (req,res,next) => {
+    const title=req.body.title;
     const newPost=new Post({
         title:req.body.title,
         content:req.body.content,
