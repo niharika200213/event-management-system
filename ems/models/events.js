@@ -45,8 +45,7 @@ const eventSchema = new Schema(
     },
     date: {
       type: Date,
-      required: true,
-      min: Date.now()
+      required: true
     },
     rate: {
       type: Number,
@@ -57,10 +56,6 @@ const eventSchema = new Schema(
       type: Number,
       min: 0,
       max: 5
-    },
-    isVerified: {
-      type: Boolean,
-      default: false
     }
   },
   { timestamps: true }

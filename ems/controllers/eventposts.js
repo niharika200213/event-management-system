@@ -44,7 +44,7 @@ exports.createPosts = async (req,res,next) => {
 
         await newPost.save();
         const user = await User.findById(userId);
-        user.event.push(newPost);
+        await user.event.push(newPost);
         await user.save();
         return res.status(200).json(newPost._id);
     }catch(err){
@@ -125,7 +125,7 @@ exports.AddImages = async (req,res,next) => {
             return res.status(422).send('you are not allowed to make changes in this post');
 
         for(let i=0;i<imgArray.length;++i)
-            post.imageUrl.push(imgArray[i]);  
+            await post.imageUrl.push(imgArray[i]);  
         await post.save();  
         return res.status(200).send('added images');
     }catch(err){

@@ -20,6 +20,10 @@ const userSchema = new Schema({
     type: Boolean,
     default: false
   },
+  isCreator: {
+    type: Boolean,
+    default: false
+  },
   event: [
     {
       type: Schema.Types.ObjectId,
