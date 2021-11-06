@@ -13,6 +13,8 @@ const clearImg = imgArray => {
 };
 
 exports.createPosts = async (req,res,next) => {
+    if(!validationResult(req).isEmpty())
+        return res.status(422).json(validationResult(req).errors[0].msg);
     const title=req.body.title;
     const content=req.body.content;
     const category=req.body.category;
@@ -77,6 +79,8 @@ exports.deletePost = async (req,res,next) => {
 };
 
 exports.updatePost = async (req,res,next) => {
+    if(!validationResult(req).isEmpty())
+        return res.status(422).json(validationResult(req).errors[0].msg);
     const userId = req.userId;
     const postId = req.params.postId;
     const content=req.body.content;

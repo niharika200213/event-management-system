@@ -6,6 +6,7 @@ const eventSchema = new Schema(
   {
     title: {
       type: String,
+      trim: true,
       required: true
     },
     imageUrl: [{
@@ -13,6 +14,7 @@ const eventSchema = new Schema(
     }],
     content: {
       type: String,
+      trim: true,
       required: true
     },
     category: [{
@@ -21,10 +23,12 @@ const eventSchema = new Schema(
     }],
     venueORlink: {
       type: String,
+      trim: true,
       required: true
     },
     city: {
       type: String,
+      trim: true
     },
     isOnline: {
       type: Boolean,
@@ -45,7 +49,8 @@ const eventSchema = new Schema(
       min: Date.now()
     },
     rate: {
-      type: String,
+      type: Number,
+      trim: true,
       required: true
     },
     ratings: {

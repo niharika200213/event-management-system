@@ -7,11 +7,14 @@ const uploadImg = require('../middleware/helpers');
 const addimages = require('../middleware/AddImages');
 
 const eventController = require('../controllers/eventposts');
+const getEventsController = require('../controllers/getPosts');
 
 router.post('/create', isAuth, uploadImg, eventController.createPosts);
 router.delete('/delete:postId', isAuth, eventController.deletePost);
 router.put('/update:postId', isAuth, eventController.updatePost);
 router.put('/AddImages:postId', isAuth, addimages, eventController.AddImages);
 router.put('/deleteImage:postId', isAuth, eventController.delImages);
+
+router.get('/events:postId', getEventsController.getPost);
 
 module.exports=router;

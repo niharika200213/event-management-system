@@ -25,7 +25,7 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message: message, data: data });
 });
 
-app.use('/post/upload',express.static(__dirname + '/images'));
+app.use(express.static(__dirname + 'images'));
 
 mongoose
   .connect(
