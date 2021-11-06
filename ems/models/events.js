@@ -15,13 +15,16 @@ const eventSchema = new Schema(
       type: String,
       required: true
     },
-    category: {
+    category: [{
       type: String,
       required: true
-    },
+    }],
     venueORlink: {
       type: String,
       required: true
+    },
+    city: {
+      type: String,
     },
     isOnline: {
       type: Boolean,

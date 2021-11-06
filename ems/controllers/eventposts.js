@@ -1,8 +1,6 @@
 const { validationResult } = require('express-validator');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const helpers = require('../middleware/helpers');
+const path=require('path');
+const fs=require('fs');
 
 const Post = require('../models/events');
 const User = require('../models/user');
@@ -20,6 +18,7 @@ exports.createPosts = async (req,res,next) => {
     const category=req.body.category;
     const venueORlink=req.body.venueORlink;
     const isOnline=req.body.isOnline;
+    const city=req.body.city;
     const time=req.body.time;
     const date=req.body.date;
     const rate=req.body.rate;
@@ -37,7 +36,8 @@ exports.createPosts = async (req,res,next) => {
             time:time,
             imageUrl:imageUrl,
             date:date,
-            rate:rate
+            rate:rate,
+            city:city
         });
 
         await newPost.save();
@@ -79,6 +79,13 @@ exports.deletePost = async (req,res,next) => {
 exports.updatePost = async (req,res,next) => {
     const userId = req.userId;
     const postId = req.params.postId;
+    const content=req.body.content;
+    const city=req.body.city;
+    const venueORlink=req.body.venueORlink;
+    const time=req.body.time;
+    const category=req.body.category;
+    const date=req.body.date;
+    const rate=req.body.rate;
     try
     {
         const post = await Post.findById(postId);
@@ -88,36 +95,66 @@ exports.updatePost = async (req,res,next) => {
         if(post.creator.toString()!==userId.toString())
             return res.status(422).send('you are not allowed to make changes in this post');
             
-        post.title=req.body.title;
-        post.content=req.body.content;
-        post.category=req.body.category;
-        post.venueORlink=req.body.venueORlink;
-        post.isOnline=req.body.isOnline;
-        post.time=req.body.time;
-        post.date=req.body.date;
-        post.rate=req.body.rate;
-        const addImg=req.body.addImg;
-
-        if(addImg){
-            let index=post.imageUrl.length;
-            let upload=multer({ storage: storage, fileFilter: helpers.imageFilter }).array('multiple_images', 10-index);
-            upload(req, res, async function(err) {
-                if (req.fileValidationError)
-                    return res.status(401).send(req.fileValidationError);
-                else if (!req.files)
-                    return res.status(402).send('Please select an image to upload');
-                else if (err||err instanceof multer.MulterError)
-                    return res.status(403).send(err);
-                const files = req.files;
-                for (let i = index-1, len = files.length; i < len+index; ++i) {
-                    post.imageUrl.push(files[i].path);
-                }
-            });
-        }
-
+        await Post.updateOne({_id:postId},{
+            $set:{content:content,venueORlink:venueORlink,city:city,
+                time:time,category:category,date:date,rate:rate}
+        });
+        return res.status(200).send(post);
     }catch(err){
         if(!err.statusCode)
           err.statusCode=500;
+        next(err);
+    }
+};
+
+exports.AddImages = async (req,res,next) => {
+    const userId = req.userId;
+    const postId = req.params.postId;
+    const imgArray = req.imagesArray;
+    try
+    {
+        const post = await Post.findById(postId);
+        if(post===null)
+            return res.status(423).send('this post does not exists');
+
+        if(post.creator.toString()!==userId.toString())
+            return res.status(422).send('you are not allowed to make changes in this post');
+
+        for(let i=0;i<imgArray.length;++i)
+            post.imageUrl.push(imgArray[i]);  
+        await post.save();  
+        return res.status(200).send('added images');
+    }catch(err){
+        if(!err.statusCode)
+          err.statusCode=500;
+        next(err);
+    }
+};
+
+exports.delImages = async (req,res,next) => {
+    const userId = req.userId;
+    const postId = req.params.postId;
+    try
+    {
+        const post = await Post.findById(postId);
+        if(post===null)
+            return res.status(423).send('this post does not exists');
+
+        if(post.creator.toString()!==userId.toString())
+            return res.status(422).send('you are not allowed to make changes in this post');
+
+        const imgPath=req.body.imgPath;
+        
+        var filepath = path.join(__dirname,'..',imgPath);
+        fs.unlink(filepath,async (err)=>{
+            if(err) 
+                return res.status(401).send('file does not exists');
+            await Post.findByIdAndUpdate(postId,{$pull:{imageUrl:imgPath}});
+            return res.status(200).send('deleted the image');
+        });
+    }catch(err){
+        if(!err.statusCode)
+            err.statusCode=500;
         next(err);
     }
 };
