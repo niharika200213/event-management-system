@@ -12,10 +12,10 @@ const imageFilter = function(req, file, cb) {
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'images/');
+        cb(null, 'images');
       },
     filename: function (req, file, cb) {
-        cb(null, file.originalname);
+        cb(null, file.originalname.replace(' ','-'));
     }
 });
 
@@ -34,7 +34,7 @@ module.exports = async (req,res,next) =>{
                 return res.status(403).send(err);
             const files = req.files;
             for (let i = 0, len = files.length; i < len; ++i) {
-                imagesArray.push(files[i].path);
+                imagesArray.push(files[i].filename);
             }
             req.imagesArray=imagesArray;
             next();

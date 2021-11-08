@@ -10,10 +10,10 @@ const imageFilter = function(req, file, cb) {
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'images/');
+        cb(null, 'images');
       },
     filename: function (req, file, cb) {
-        cb(null, file.originalname);
+        cb(null, file.originalname.replace(' ','-'));
     }
 });
 
@@ -23,6 +23,7 @@ module.exports = (req,res,next) => {
         let imagesArray=[];
         let upload=multer({ storage: storage, fileFilter: imageFilter }).array('multiple_images', 10);
         upload(req, res, async function(err) {
+            console.log(req.files);
             if (req.fileValidationError)
                 return res.status(401).send('format not supported or limit exceeded');
             else if (!req.files)
@@ -32,7 +33,7 @@ module.exports = (req,res,next) => {
             const files = req.files;
             let index, len;
             for (index = 0, len = files.length; index < len; ++index) {
-                imagesArray.push(files[index].path);
+                imagesArray.push(files[index].filename);
             }
             req.imagesArray=imagesArray;
             next();
