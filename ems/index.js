@@ -3,7 +3,7 @@ const app=express();
 const cors=require('cors');
 const mongoose=require('mongoose');
 require('dotenv/config');
-
+const path = require('path');
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/eventposts');
 const isAuth = require('./middleware/is-auth');
@@ -19,7 +19,7 @@ app.use(cors({
 app.use('/auth',authRoutes);
 app.use('/post',postRoutes);
 app.get('/', function (req,res){res.json({name:"prakhar", age:"19"})});
-app.use(express.static(__dirname + 'images'));
+app.use(express.static(path.join(__dirname,'images')));
 
 app.use((error, req, res, next) => {
   console.log(error);

@@ -35,7 +35,7 @@ exports.bookmark = async (req,res,next) => {
             return res.status(401).send('the event does not exists');
         const creator = await User.findById(post.creator);
         if(!creator.isCreator)
-            return res.status(402).send('cannot bookmark unverified post');
+            return res.status(402).send('cannot bookmark unverified event');
 
         const user = await User.findById(userId);
         await user.bookmarked.push(postId);
@@ -59,7 +59,7 @@ exports.register = async (req,res,next) => {
             return res.status(401).send('the event does not exists');
         const creator = await User.findById(post.creator);
         if(!creator.isCreator)
-            return res.status(402).send('cannot book unverified post');
+            return res.status(402).send('cannot book unverified event');
 
         const user = await User.findById(userId);
         await user.registeredEvents.push(postId);
@@ -69,6 +69,24 @@ exports.register = async (req,res,next) => {
             subject: 'Verify', html: `<h1>your booking is confirmed for<br>${post.title}</h1>`
           });
         return res.status(200).send('booked event');
+    }catch(err){
+        if(!err.statusCode)
+            err.statusCode=500;
+        next(err);
+    }
+};
+
+exports.ratings = async (req,res,next) => {
+    try{
+        const postId = req.params.postId;
+        const userId = req.userId;
+        const post = await Post.findById(postId);
+        if(!post)
+            return res.status(401).send('the event does not exists');
+        const creator = await User.findById(post.creator);
+        if(!creator.isCreator)
+            return res.status(402).send('cannot rate unverified event');
+
     }catch(err){
         if(!err.statusCode)
             err.statusCode=500;
