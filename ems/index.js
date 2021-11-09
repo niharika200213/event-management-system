@@ -16,6 +16,10 @@ app.use(cors({
   origin: "*",
   methods: ['GET','POST','PUT','DELETE']
 }));
+app.use('/auth',authRoutes);
+app.use('/post',postRoutes);
+app.get('/', function (req,res){res.json({name:"prakhar", age:"19"})});
+app.use(express.static(__dirname + 'images'));
 
 app.use((error, req, res, next) => {
   console.log(error);
@@ -24,8 +28,6 @@ app.use((error, req, res, next) => {
   const data = error.data;
   res.status(status).json({ message: message, data: data });
 });
-
-app.use('/images',express.static(__dirname + 'images'));
 
 mongoose
   .connect(
@@ -39,6 +41,4 @@ mongoose
   .catch(err => console.log(err));
 
 
-app.use('/auth',authRoutes);
-app.use('/post',postRoutes);
-app.get('/', function (req,res){res.json({name:"prakhar", age:"19"})});
+

@@ -24,7 +24,7 @@ module.exports = async (req,res,next) =>{
         const post = await Post.findById(req.params.postId);
         let imagesArray=[];
         let index=post.imageUrl.length;
-        let upload=multer({ storage: storage, fileFilter: imageFilter }).array('multiple_images', 10-index);
+        let upload=multer({ storage: storage, fileFilter: imageFilter }).array('files', 10-index);
         upload(req, res, async function(err) {
             if (req.fileValidationError)
                 return res.status(401).send('limit exceeded or format not supported');

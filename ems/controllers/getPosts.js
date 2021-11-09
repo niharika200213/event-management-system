@@ -1,5 +1,12 @@
 const Post = require('../models/events');
 const User = require('../models/user');
+const nodemailer=require('nodemailer');
+const sendgridTransport=require('nodemailer-sendgrid-transport');
+const transporter=nodemailer.createTransport(sendgridTransport({
+    auth:{api_key: process.env.API_KEY}
+  }));
+
+require('dotenv/config');
 
 exports.getPost = async (req,res,next) => {
     const postId = req.params.postId;
@@ -42,10 +49,11 @@ exports.bookmark = async (req,res,next) => {
 };
 
 exports.register = async (req,res,next) => {
-    const postId = req.params.postId;
-    const userId = req.userId;
     try
     {
+        const postId = req.params.postId;
+        const userId = req.userId;
+        const email = req.userEmail;
         const post = await Post.findById(postId);
         if(!post)
             return res.status(401).send('the event does not exists');
@@ -56,6 +64,10 @@ exports.register = async (req,res,next) => {
         const user = await User.findById(userId);
         await user.registeredEvents.push(postId);
         await user.save();
+        transporter.sendMail({
+            to: email, from: 'eventooze@gmail.com',
+            subject: 'Verify', html: `<h1>your booking is confirmed for<br>${post.title}</h1>`
+          });
         return res.status(200).send('booked event');
     }catch(err){
         if(!err.statusCode)

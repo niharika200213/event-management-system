@@ -11,11 +11,12 @@ module.exports = async (req, res, next) => {
   try {
     decodedToken = jwt.verify(token, process.env.JWT_KEY);
   } catch (err) {
-    return res.status(500).send('session expired login again');
+    return res.status(403).send('session expired login again');
   }
   if (!decodedToken) {
     return res.status(402).send('Not authenticated.');
   }
   req.userId=decodedToken.userId;
+  req.userEmail=decodedToken.email;
   next();
 };

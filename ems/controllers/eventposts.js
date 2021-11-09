@@ -15,19 +15,20 @@ const clearImg = imgArray => {
 exports.createPosts = async (req,res,next) => {
     if(!validationResult(req).isEmpty())
         return res.status(422).json(validationResult(req).errors[0].msg);
-    const title=req.body.title;
-    const content=req.body.content;
-    const category=req.body.category;
-    const venueORlink=req.body.venueORlink;
-    const isOnline=req.body.isOnline;
-    const city=req.body.city;
-    const time=req.body.time;
-    const date=req.body.date;
-    const rate=req.body.rate;
-    const imageUrl=req.imagesArray;
-    const userId=req.userId;
     try
     {
+        const title=req.body.title;
+        const content=req.body.content;
+        const category=req.body.category;
+        const venueORlink=req.body.venueORlink;
+        const isOnline=req.body.isOnline;
+        const city=req.body.city;
+        const time=req.body.time;
+        const date=req.body.date;
+        const rate=req.body.rate;
+        const imageUrl=req.imagesArray;
+        const userId=req.userId;
+
         const newPost=new Post({
             title:title,
             content:content,
@@ -68,6 +69,9 @@ exports.deletePost = async (req,res,next) => {
         
         clearImg(post.imageUrl);
         await Post.findByIdAndRemove(postId);
+        await User.updateMany({bookmarked:postId},{$pull:{bookmarked:postId}});
+        await User.updateMany({registeredEvents:postId},{$pull:{registeredEvents:postId}});
+        await User.updateMany({ratedEvents:postId},{$pull:{ratedEvents:postId}});
         await User.findByIdAndUpdate(userId,{$pull:{event:postId}});
         return res.status(200).send('deleted event');
         
@@ -81,17 +85,18 @@ exports.deletePost = async (req,res,next) => {
 exports.updatePost = async (req,res,next) => {
     if(!validationResult(req).isEmpty())
         return res.status(422).json(validationResult(req).errors[0].msg);
-    const userId = req.userId;
-    const postId = req.params.postId;
-    const content=req.body.content;
-    const city=req.body.city;
-    const venueORlink=req.body.venueORlink;
-    const time=req.body.time;
-    const category=req.body.category;
-    const date=req.body.date;
-    const rate=req.body.rate;
     try
     {
+        const userId = req.userId;
+        const postId = req.params.postId;
+        const content=req.body.content;
+        const city=req.body.city;
+        const venueORlink=req.body.venueORlink;
+        const time=req.body.time;
+        const category=req.body.category;
+        const date=req.body.date;
+        const rate=req.body.rate;
+
         const post = await Post.findById(postId);
         if(post===null)
             return res.status(423).send('this post does not exists');
@@ -99,7 +104,7 @@ exports.updatePost = async (req,res,next) => {
         if(post.creator.toString()!==userId.toString())
             return res.status(422).send('you are not allowed to make changes in this post');
             
-        await Post.updateOne({_id:postId},{
+        await Post.findByIdAndUpdate(postId,{
             $set:{content:content,venueORlink:venueORlink,city:city,
                 time:time,category:category,date:date,rate:rate}
         });
@@ -149,7 +154,7 @@ exports.delImages = async (req,res,next) => {
 
         const imgPath=req.body.imgPath;
         
-        var filepath = path.join(__dirname,'..',imgPath);
+        var filepath = path.join(__dirname,'../images',imgPath);
         fs.unlink(filepath,async (err)=>{
             if(err) 
                 return res.status(401).send('file does not exists');

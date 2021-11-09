@@ -12,7 +12,7 @@ const otpSchema = new Schema({
       type: String,
       required: true
   },
-  createdAt: {type: Date, default: Date.now(), expireAfterSeconds: 600}
+  createdAt: {type: Date, default: Date.now(), expireAfterSeconds: 3600}
 }, {timestamps: true});
 
 module.exports = mongoose.model('OTP', otpSchema);
