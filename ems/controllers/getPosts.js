@@ -2,6 +2,7 @@ const Post = require('../models/events');
 const User = require('../models/user');
 const nodemailer=require('nodemailer');
 const sendgridTransport=require('nodemailer-sendgrid-transport');
+const { isEmpty } = require('lodash');
 const transporter=nodemailer.createTransport(sendgridTransport({
     auth:{api_key: process.env.API_KEY}
   }));
@@ -13,16 +14,15 @@ exports.getCreated = async (req,res,next) => {
         const userid = req.userId;
         const postArray=[];
         const user = await User.findById(userid);
-        if(user.isCreator){
-            for(let i=0;i<user.event.length;++i){
-                var postId = user.event[i];
-                var post = await Post.findById(postId);
-                postArray.push(post);
-            }
-            return res.status(200).json(postArray);
+        for(let i=0;i<user.event.length;++i){
+            var postId = user.event[i];
+            var post = await Post.findById(postId);
+            postArray.push(post);
         }
+        if(!isEmpty(postArray))
+            return res.status(200).json(postArray);
         else
-            return res.status(401).send('you are not a creator');
+            return res.status(401).send('you have not created any events');
         
     }catch(err){
         if(!err.statusCode)
@@ -89,7 +89,7 @@ exports.register = async (req,res,next) => {
         await user.save();
         transporter.sendMail({
             to: email, from: 'eventooze@gmail.com',
-            subject: 'Verify', html: `<h1>your booking is confirmed for<br>${post.title}</h1>`
+            subject: 'confirm booking', html: `<h1>your booking is confirmed for<br>${post.title}</h1>`
           });
         return res.status(200).send('booked event');
     }catch(err){

@@ -52,6 +52,8 @@ exports.createPosts = async (req,res,next) => {
         await newPost.save();
         const user = await User.findById(userId);
         await user.event.push(newPost);
+        if(!user.isCreator)
+            user.apply=true;
         await user.save();
         return res.status(200).json(newPost._id);
     }catch(err){

@@ -6,7 +6,7 @@ require('dotenv/config');
 const path = require('path');
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/eventposts');
-const isAuth = require('./middleware/is-auth');
+const adminRoutes = require('./routes/admin');
 
 app.use(express.json());
 
@@ -18,6 +18,7 @@ app.use(cors({
 }));
 app.use('/auth',authRoutes);
 app.use('/post',postRoutes);
+app.use('/admin',adminRoutes);
 app.get('/', function (req,res){res.json({name:"prakhar", age:"19"})});
 app.use(express.static(path.join(__dirname,'images')));
 
@@ -36,7 +37,7 @@ mongoose
   )
   .then(result => {
     console.log('connection established');
-    app.listen(8080);
+    app.listen(3000);
   })
   .catch(err => console.log(err));
 

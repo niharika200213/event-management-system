@@ -75,7 +75,7 @@ exports.verifyOtp = async (req, res, next) => {
       const result = await user.save();
       const token = jwt.sign({
         email:result.email, userId:result._id.toString()
-        }, process.env.JWT_KEY, {expiresIn: '3h'});
+        }, process.env.JWT_KEY, {expiresIn: '12h'});
 
       const response = await OTP.deleteMany({ email: email });
       return res.status(201).json({ token: token, userId: result._id.toString() });
@@ -106,7 +106,7 @@ exports.login = async (req, res, next) => {
 
     const token = jwt.sign({
       email: loadedUser.email, userId: loadedUser._id.toString()
-    }, process.env.JWT_KEY, { expiresIn: '3h' });
+    }, process.env.JWT_KEY, { expiresIn: '12h' });
     return res.status(200).json({token: token, userId: loadedUser._id.toString()});
   }catch(err){
     if(!err.statusCode)
