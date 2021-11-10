@@ -8,6 +8,29 @@ const transporter=nodemailer.createTransport(sendgridTransport({
 
 require('dotenv/config');
 
+exports.getCreated = async (req,res,next) => {
+    try{
+        const userid = req.userId;
+        const postArray=[];
+        const user = await User.findById(userid);
+        if(user.isCreator){
+            for(let i=0;i<user.event.length;++i){
+                var postId = user.event[i];
+                var post = await Post.findById(postId);
+                postArray.push(post);
+            }
+            return res.status(200).json(postArray);
+        }
+        else
+            return res.status(401).send('you are not a creator');
+        
+    }catch(err){
+        if(!err.statusCode)
+            err.statusCode=500;
+        next(err);
+    }
+};
+
 exports.getPost = async (req,res,next) => {
     const postId = req.params.postId;
     try{
@@ -86,6 +109,20 @@ exports.ratings = async (req,res,next) => {
         const creator = await User.findById(post.creator);
         if(!creator.isCreator)
             return res.status(402).send('cannot rate unverified event');
+
+        const user = await User.findById(userId);
+        const regEvents = user.registeredEvents;
+        for(let i=0;i<regEvents.length;++i){
+            if(regEvents[i]===postId)
+                return res.status(403).send('you cannot rate an event without booking it');
+        }
+
+        const rated = user.ratedEvents;
+        for(let i=0;i<rated.length;++i){
+            if(rated[i]===postId)
+                return res.status(423).send('an event cannot be rated again');
+        }
+        
 
     }catch(err){
         if(!err.statusCode)

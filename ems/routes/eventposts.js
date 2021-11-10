@@ -18,5 +18,6 @@ router.put('/deleteImage:postId', isAuth, eventController.delImages);
 router.get('/events:postId', getEventsController.getPost);
 router.post('/bookmark:postId', isAuth, getEventsController.bookmark);
 router.post('/book:postId', isAuth, getEventsController.register);
+router.get('/createdEvents', isAuth, getEventsController.getCreated);
 
 module.exports=router;

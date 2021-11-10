@@ -21,11 +21,8 @@ module.exports = (req,res,next) => {
     try
     {
         let imagesArray=[];
-        console.log('working');
         let upload=multer({ storage: storage, fileFilter: imageFilter }).array('files', 10);
         upload(req, res, async function(err) {
-           // console.log(req)
-            console.log(req.files);
             if (req.fileValidationError)
                 return res.status(401).send('format not supported or limit exceeded');
             else if (!req.files)

@@ -22,7 +22,7 @@ const userSchema = new Schema({
   },
   isCreator: {
     type: Boolean,
-    default: false
+    default: true
   },
   event: [
     {

@@ -6,9 +6,15 @@ const Post = require('../models/events');
 const User = require('../models/user');
 
 const clearImg = imgArray => {
-    for(let i=0;i<imgArray.length;++i){
-        var filepath = path.join(__dirname,'..',imgArray[i]);
-        fs.unlink(filepath,err=>console.log(err));
+    try{
+        for(let i=0; i<imgArray.length; ++i){
+            var filepath = path.join(__dirname, '..', imgArray[i]);
+            fs.unlink(filepath, err => console.log(err));
+        }
+    }catch(err){
+        if(!err.statusCode)
+            err.statusCode=500;
+        next(err);
     }
 };
 
@@ -50,7 +56,7 @@ exports.createPosts = async (req,res,next) => {
         return res.status(200).json(newPost._id);
     }catch(err){
         if(!err.statusCode)
-          err.statusCode=500;
+            err.statusCode=500;
         next(err);
     }
 };

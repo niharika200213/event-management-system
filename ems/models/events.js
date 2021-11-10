@@ -55,7 +55,16 @@ const eventSchema = new Schema(
     ratings: {
       type: Number,
       min: 0,
-      max: 5
+      max: 5,
+      default: 0
+    },
+    noOfRatings: {
+      type: Number,
+      default: 0
+    },
+    sumOfRatings: {
+      type: Number,
+      default: 0
     }
   },
   { timestamps: true }
