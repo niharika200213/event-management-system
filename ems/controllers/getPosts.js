@@ -103,6 +103,7 @@ exports.ratings = async (req,res,next) => {
     try{
         const postId = req.params.postId;
         const userId = req.userId;
+        const rating = req.body.rating;
         const post = await Post.findById(postId);
         if(!post)
             return res.status(401).send('the event does not exists');
@@ -122,7 +123,12 @@ exports.ratings = async (req,res,next) => {
             if(rated[i]===postId)
                 return res.status(423).send('an event cannot be rated again');
         }
-        
+        const no = post.noOfRatings;
+        ++no;
+        post.noOfRatings = no;
+        const sum = post.sumOfRatings;
+        sum += rating;
+        post.sumOfRatings = sum;
 
     }catch(err){
         if(!err.statusCode)
