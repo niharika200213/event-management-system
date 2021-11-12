@@ -1,9 +1,11 @@
 const { validationResult } = require('express-validator');
 const path=require('path');
 const fs=require('fs');
+const mongoose = require('mongoose');
 
 const Post = require('../models/events');
 const User = require('../models/user');
+const { updateOne } = require('../models/user');
 
 const clearImg = imgArray => {
     try{
@@ -98,13 +100,12 @@ exports.updatePost = async (req,res,next) => {
         const userId = req.userId;
         const postId = req.params.postId;
         const content=req.body.content;
-        const city=req.body.city;
-        const venueORlink=req.body.venueORlink;
         const time=req.body.time;
         const category=req.body.category;
         const date=req.body.date;
         const rate=req.body.rate;
 
+        console.log(content);
         const post = await Post.findById(postId);
         if(post===null)
             return res.status(423).send('this post does not exists');
@@ -112,10 +113,8 @@ exports.updatePost = async (req,res,next) => {
         if(post.creator.toString()!==userId.toString())
             return res.status(422).send('you are not allowed to make changes in this post');
             
-        await Post.findByIdAndUpdate(postId,{
-            $set:{content:content,venueORlink:venueORlink,city:city,
-                time:time,category:category,date:date,rate:rate}
-        });
+        await Post.findByIdAndUpdate(postId,{$set:
+            {content:content,time:time,category:category,date:date,rate:rate}});
         return res.status(200).send(post);
     }catch(err){
         if(!err.statusCode)

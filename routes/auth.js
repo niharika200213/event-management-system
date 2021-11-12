@@ -7,7 +7,7 @@ const passcontroller = require('../controllers/password');
 
 const router = express.Router();
 
-router.put(
+router.post(
   '/signup',
   [
     body('email')

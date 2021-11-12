@@ -16,6 +16,7 @@ router.put('/AddImages/:postId', isAuth, addimages, eventController.AddImages);
 router.put('/deleteImage/:postId', isAuth, eventController.delImages);
 
 router.get('/events/:postId', getEventsController.getPost);
+router.get('/getAll', getEventsController.getAll);
 router.post('/bookmark/:postId', isAuth, getEventsController.bookmark);
 router.post('/book/:postId', isAuth, getEventsController.register);
 router.get('/createdEvents', isAuth, getEventsController.getCreated);

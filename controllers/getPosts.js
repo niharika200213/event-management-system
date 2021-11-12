@@ -31,6 +31,17 @@ exports.getCreated = async (req,res,next) => {
     }
 };
 
+exports.getAll = async (req,res,next) => {
+    try{
+        console.log(Post);
+        return res.status(200).send('all posts fetched');
+    }catch(err){
+        if(!err.statusCode)
+            err.statusCode=500;
+        next(err);
+    }
+};
+
 exports.getPost = async (req,res,next) => {
     const postId = req.params.postId;
     try{
