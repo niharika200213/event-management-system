@@ -19,9 +19,12 @@ router.put('/deleteImage/:postId', isAuth, eventController.delImages);
 router.get('/events/:postId', getEventsController.getPost);
 router.get('/getAll', getEventsController.getAll);
 router.post('/bookmark/:postId', isAuth, getEventsController.bookmark);
+router.put('/unFav/:postId', isAuth, getEventsController.unFav);
+router.get('/bookmark', isAuth, getEventsController.getBookmark);
 router.post('/book/:postId', isAuth, getEventsController.register);
 router.get('/createdEvents', isAuth, getEventsController.getCreated);
 
 router.get('/eventSearch', filterController.search);
+router.get('/filtered', filterController.filter);
 
 module.exports=router;

@@ -65,6 +65,20 @@ exports.getPost = async (req,res,next) => {
     }
 };
 
+exports.getBookmark = async (req,res,next) => {
+    try{
+        const userId = req.userId;
+        const user = await User.findById(userId).populate('bookmarked');
+        if(isEmpty(user.bookmarked))
+            return res.status(401).send('no events bookmarked');
+        return res.status(200).send(user.bookmarked);
+    }catch(err){
+        if(!err.statusCode)
+            err.statusCode=500;
+        next(err);
+    }
+};
+
 exports.bookmark = async (req,res,next) => {
     const postId = req.params.postId;
     const userId = req.userId;
@@ -80,6 +94,19 @@ exports.bookmark = async (req,res,next) => {
         await user.bookmarked.push(postId);
         await user.save();
         return res.status(200).send('added to favourites');
+    }catch(err){
+        if(!err.statusCode)
+            err.statusCode=500;
+        next(err);
+    }
+};
+
+exports.unFav = async (req,res,next) => {
+    try{
+        const userId = req.userId;
+        const postId = req.params.postId;
+        await User.findByIdAndUpdate(userId, {$pull:{bookmarked:postId}});
+        return res.status(200).send('removed from favourites');
     }catch(err){
         if(!err.statusCode)
             err.statusCode=500;
@@ -134,11 +161,6 @@ exports.ratings = async (req,res,next) => {
                 return res.status(403).send('you cannot rate an event without booking it');
         }
 
-        const rated = user.ratedEvents;
-        for(let i=0;i<rated.length;++i){
-            if(rated[i]===postId)
-                return res.status(423).send('an event cannot be rated again');
-        }
         const no = post.noOfRatings;
         ++no;
         post.noOfRatings = no;
