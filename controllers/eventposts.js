@@ -5,12 +5,11 @@ const mongoose = require('mongoose');
 
 const Post = require('../models/events');
 const User = require('../models/user');
-const { updateOne } = require('../models/user');
 
 const clearImg = imgArray => {
     try{
         for(let i=0; i<imgArray.length; ++i){
-            var filepath = path.join(__dirname, '..', imgArray[i]);
+            var filepath = path.join(__dirname, '../images', imgArray[i]);
             fs.unlink(filepath, err => console.log(err));
         }
     }catch(err){
@@ -52,10 +51,9 @@ exports.createPosts = async (req,res,next) => {
         });
 
         await newPost.save();
-        const user = await User.findById(userId);
-        await user.event.push(newPost);
+        let user = await User.findByIdAndUpdate(userId,{$push:{event:newPost}},{new:true});
         if(!user.isCreator)
-            user.apply=true;
+            user = await User.findByIdAndUpdate(userId,{$set:{apply:true}},{new:true});
         await user.save();
         return res.status(200).json(newPost._id);
     }catch(err){
@@ -113,9 +111,9 @@ exports.updatePost = async (req,res,next) => {
         if(post.creator.toString()!==userId.toString())
             return res.status(422).send('you are not allowed to make changes in this post');
             
-        await Post.findByIdAndUpdate(postId,{$set:
-            {content:content,time:time,category:category,date:date,rate:rate}});
-        return res.status(200).send(post);
+        const updatedPost = await Post.findByIdAndUpdate(postId,{$set:
+            {content:content,time:time,category:category,date:date,rate:rate}},{new:true});
+        return res.status(200).send(updatedPost);
     }catch(err){
         if(!err.statusCode)
           err.statusCode=500;
