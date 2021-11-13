@@ -33,8 +33,13 @@ exports.getCreated = async (req,res,next) => {
 
 exports.getAll = async (req,res,next) => {
     try{
-        console.log(Post);
-        return res.status(200).send('all posts fetched');
+        const posts = await Post.find().populate('creator');
+        let allPosts = [];
+        for(let i=0;i<posts.length;++i){
+            if(posts[i].creator.isCreator)
+                allPosts.push(posts[i]);
+        }
+        return res.status(200).send(allPosts);
     }catch(err){
         if(!err.statusCode)
             err.statusCode=500;

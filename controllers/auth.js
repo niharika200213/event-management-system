@@ -12,7 +12,7 @@ const transporter=nodemailer.createTransport(sendgridTransport({
 require('dotenv/config');
 
 const User = require('../models/user');
-const OTP = require('../models/OTP');
+const OTP = require('../models/otp');
 
 exports.generate_otp = async (req, res, next) => {
     if(!validationResult(req).isEmpty())
@@ -56,7 +56,7 @@ exports.verifyOtp = async (req, res, next) => {
   const otp = req.body.otp;
   try
   {
-    const user = await User.findOne({ email: email })
+    const user = await User.findOne({ email: email });
     if (user)
         return res.status(401).send('Already verified.');
 
@@ -132,7 +132,7 @@ exports.adminLogin = (req,res,next) => {
     return res.status(402).send('this email does not belong to the admin');
   }catch(err){
     if(!err.statusCode)
-      err.statusCode=500;
+        err.statusCode=500;
     next(err);
   }
 };

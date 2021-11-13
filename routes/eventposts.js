@@ -7,6 +7,7 @@ const uploadImg = require('../middleware/helpers');
 const addimages = require('../middleware/AddImages');
 
 const eventController = require('../controllers/eventposts');
+const filterController = require('../controllers/filter');
 const getEventsController = require('../controllers/getPosts');
 
 router.post('/create', isAuth, uploadImg, eventController.createPosts);
@@ -20,5 +21,7 @@ router.get('/getAll', getEventsController.getAll);
 router.post('/bookmark/:postId', isAuth, getEventsController.bookmark);
 router.post('/book/:postId', isAuth, getEventsController.register);
 router.get('/createdEvents', isAuth, getEventsController.getCreated);
+
+router.get('/eventSearch', filterController.search);
 
 module.exports=router;

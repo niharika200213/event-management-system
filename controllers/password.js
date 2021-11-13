@@ -10,7 +10,7 @@ const transporter=nodemailer.createTransport(sendgridTransport({
 }));
 
 const User = require('../models/user');
-const OTP = require('../models/OTP');
+const OTP = require('../models/otp');
 
 exports.resetpass = async (req, res, next) => {
   if(!validationResult(req).isEmpty())

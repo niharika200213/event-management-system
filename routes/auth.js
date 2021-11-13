@@ -2,6 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 
 const User = require('../models/user');
+const isAuth = require('../middleware/is-auth');
 const authController = require('../controllers/auth');
 const passcontroller = require('../controllers/password');
 
@@ -56,6 +57,12 @@ router.put('/signup/verify',
     .not()
     .isEmpty()
     .withMessage('please enter your name')
+    .custom(async (value, { res }) => {
+      const userDoc = await User.findOne({ name: value });
+      if (userDoc)
+        return res.status(422).json('username already exists');
+    })
+    .withMessage('username already exists')
     .isAlphanumeric()
     .withMessage('please enter a valid name')
 ], authController.verifyOtp);
