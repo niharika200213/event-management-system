@@ -23,6 +23,7 @@ router.put('/unFav/:postId', isAuth, getEventsController.unFav);
 router.get('/bookmark', isAuth, getEventsController.getBookmark);
 router.post('/book/:postId', isAuth, getEventsController.register);
 router.get('/createdEvents', isAuth, getEventsController.getCreated);
+router.patch('/rating/:postId', isAuth, getEventsController.ratings);
 
 router.get('/eventSearch', filterController.search);
 router.get('/filtered', filterController.filter);

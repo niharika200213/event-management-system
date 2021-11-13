@@ -51,10 +51,9 @@ exports.createPosts = async (req,res,next) => {
         });
 
         await newPost.save();
-        const user = await User.findById(userId);
-        await user.event.push(newPost);
+        let user = await User.findByIdAndUpdate(userId,{$push:{event:newPost}},{new:true});
         if(!user.isCreator)
-            user.apply=true;
+            user = await User.findByIdAndUpdate(userId,{$set:{apply:true}},{new:true});
         await user.save();
         return res.status(200).json(newPost._id);
     }catch(err){

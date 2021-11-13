@@ -42,17 +42,16 @@ exports.filter = async (req,res,next) => {
         const rateB = req.query.rateB;
         let ratings = parseInt(req.query.ratings);
         if(category[0]!==undefined){
-            for(let i=0;i<category.length;++i){
-                post = await Post.find({category:category[i]});
-                if(post!==null)
-                    for(let j=0;j<post.length;++j)
-                        postArray.push(post[j]);
-            }
-        }
+            post = await Post.find({category:{$in:category}});
+            if(post!==null)
+                for(let j=0;j<post.length;++j)
+                    postArray.push(post[j]);
+        }//category undefined condition left
         post = await Post.find({$and:[{date:{$gte: Date(dateA),$lt: Date(dateB)}},
             {isOnline:isOnline},{city:city},{rate:{$gte:rateA,$lt:rateB}},
             {ratings:{$gte:ratings}},{time:{$gte:timeA,$lt:timeB}}
-            ]});
+            ]});//multiple fields left
+            //array condition left
         for(let j=0;j<post.length;++j)
             postArray.push(post[j]);
         let filteredPosts = [...new Set(postArray)];

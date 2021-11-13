@@ -155,19 +155,21 @@ exports.ratings = async (req,res,next) => {
             return res.status(402).send('cannot rate unverified event');
 
         const user = await User.findById(userId);
-        const regEvents = user.registeredEvents;
-        for(let i=0;i<regEvents.length;++i){
-            if(regEvents[i]===postId)
-                return res.status(403).send('you cannot rate an event without booking it');
+        for(let i=0;i<user.registeredEvents.length;++i){
+            let regEve = String(user.registeredEvents[i]);
+            if(regEve===postId){
+                const no = post.noOfRatings+1;
+                const sum = post.sumOfRatings+rating;
+                const finalRating = sum/no;
+                const newPost = await Post.findByIdAndUpdate(postId,{$set:{
+                    noOfRatings:no,sumOfRatings:sum,ratings:finalRating}},{new:true});
+                await newPost.save();
+                return res.status(200).send(newPost);
+            }
         }
+        return res.status(403).send('you cannot rate an event without booking it');
 
-        const no = post.noOfRatings;
-        ++no;
-        post.noOfRatings = no;
-        const sum = post.sumOfRatings;
-        sum += rating;
-        post.sumOfRatings = sum;
-
+        
     }catch(err){
         if(!err.statusCode)
             err.statusCode=500;
