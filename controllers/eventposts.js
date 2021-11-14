@@ -79,7 +79,8 @@ exports.deletePost = async (req,res,next) => {
         await Post.findByIdAndRemove(postId);
         await User.updateMany({bookmarked:postId},{$pull:{bookmarked:postId}});
         await User.updateMany({registeredEvents:postId},{$pull:{registeredEvents:postId}});
-        await User.updateMany({ratedEvents:postId},{$pull:{ratedEvents:postId}});
+        await User.updateMany({ratedEvents:{$regex:`^${postId}`, $options:'i'}},
+            {$pull:{ratedEvents:{$regex:`^${postId}`, $options:'i'}}});
         await User.findByIdAndUpdate(userId,{$pull:{event:postId}});
         return res.status(200).send('deleted event');
         
@@ -102,8 +103,6 @@ exports.updatePost = async (req,res,next) => {
         const category=req.body.category;
         const date=req.body.date;
         const rate=req.body.rate;
-
-        console.log(content);
         const post = await Post.findById(postId);
         if(post===null)
             return res.status(423).send('this post does not exists');

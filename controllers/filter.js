@@ -1,4 +1,4 @@
-const { isArray } = require('lodash');
+const { isArray, isEmpty } = require('lodash');
 const Post = require('../models/events');
 const User = require('../models/user');
 
@@ -56,6 +56,24 @@ exports.filter = async (req,res,next) => {
             postArray.push(post[j]);
         let filteredPosts = [...new Set(postArray)];
         return res.status(200).send(filteredPosts);
+    }catch(err){
+        if(!err.statusCode)
+            err.statusCode=500;
+        next(err);
+    }
+};
+
+exports.getUserDetails = async (req,res,next) => {
+    try{
+        const userId = req.userId;
+        const user = await User.findById(userId);
+        if(!isEmpty(user.event))
+            user.populate('event');
+        if(!isEmpty(user.bookmarked))
+            user.populate('bookmarked');
+        if(!isEmpty(user.registeredEvents))
+            user.populate('registeredEvents');
+        return res.status(200).send(user);
     }catch(err){
         if(!err.statusCode)
             err.statusCode=500;

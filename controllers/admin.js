@@ -89,7 +89,8 @@ exports.delAnyPost = async (req,res,next) => {
         await Post.findByIdAndRemove(postId);
         await User.updateMany({bookmarked:postId},{$pull:{bookmarked:postId}});
         await User.updateMany({registeredEvents:postId},{$pull:{registeredEvents:postId}});
-        await User.updateMany({ratedEvents:postId},{$pull:{ratedEvents:postId}});
+        await User.updateMany({ratedEvents:{$regex:`^${postId}`, $options:'i'}},
+            {$pull:{ratedEvents:{$regex:`^${postId}`, $options:'i'}}});
         await User.findByIdAndUpdate(post.creator,{$pull:{event:postId}});
         return res.status(200).send('deleted event');
     }catch(err){
