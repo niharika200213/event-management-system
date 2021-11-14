@@ -146,7 +146,7 @@ exports.ratings = async (req,res,next) => {
     try{
         const postId = req.params.postId;
         const userId = req.userId;
-        const rating = req.body.rating;
+        const rating = Number(req.body.rating);
         const post = await Post.findById(postId);
         if(!post)
             return res.status(401).send('the event does not exists');
@@ -158,13 +158,29 @@ exports.ratings = async (req,res,next) => {
         for(let i=0;i<user.registeredEvents.length;++i){
             let regEve = String(user.registeredEvents[i]);
             if(regEve===postId){
-                const no = post.noOfRatings+1;
-                const sum = post.sumOfRatings+rating;
-                const finalRating = sum/no;
-                const newPost = await Post.findByIdAndUpdate(postId,{$set:{
+                for(let j=0;j<user.ratedEvents.length;++j){
+                    let ratedEventId = String(String(user.ratedEvents[i]).split(',')[0]);
+                    if(ratedEventId===String(postId)){
+                        await User.findByIdAndUpdate(userId,{$pull:{ratedEvents:user.ratedEvents[i]}});
+                        var prevRating = Number(String(user.ratedEvents[i]).split(',')[1]);
+                        console.log(prevRating);
+                        var sum = post.sumOfRatings-prevRating+rating;
+                        var final = Number(sum/post.noOfRatings);
+                        await Post.findByIdAndUpdate(postId,{$set:{
+                            sumOfRatings:sum,ratings:final}},{new:true});
+                        var eventId = String(ratedEventId+','+rating);
+                        await User.findByIdAndUpdate(userId,{$push:{ratedEvents:eventId}});
+                        return res.status(200).send('rated again');
+                    }
+                }
+                var no = post.noOfRatings+1;
+                var sum = post.sumOfRatings+rating;
+                var finalRating = Number(sum/no);
+                var eventId = String(postId+','+rating);
+                await Post.findByIdAndUpdate(postId,{$set:{
                     noOfRatings:no,sumOfRatings:sum,ratings:finalRating}},{new:true});
-                await newPost.save();
-                return res.status(200).send(newPost);
+                await User.findByIdAndUpdate(userId,{$push:{ratedEvents:eventId}});
+                return res.status(200).send('rated');
             }
         }
         return res.status(403).send('you cannot rate an event without booking it');

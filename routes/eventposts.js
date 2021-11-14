@@ -27,5 +27,6 @@ router.patch('/rating/:postId', isAuth, getEventsController.ratings);
 
 router.get('/eventSearch', filterController.search);
 router.get('/filtered', filterController.filter);
+router.get('/dashboard', isAuth, filterController.getUserDetails);
 
 module.exports=router;

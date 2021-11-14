@@ -48,8 +48,7 @@ const userSchema = new Schema({
   ],
   ratedEvents: [
     {
-      type: Schema.Types.ObjectId,
-      ref: 'event'
+      type: String
     }
   ]
 }, {timestamps: true});
