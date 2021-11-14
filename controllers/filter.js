@@ -32,7 +32,7 @@ exports.filter = async (req,res,next) => {
         const isOnline = req.query.isOnline;
         let ratePost = await Post.find().sort({rate:-1}).limit(1);
         let rate = ratePost[0].rate;
-        if(req.query.rate!=0)
+        if(req.query.rate!==undefined)
             rate = req.query.rate;
         if(req.query.ratings!==undefined)
             ratings = req.query.ratings;
