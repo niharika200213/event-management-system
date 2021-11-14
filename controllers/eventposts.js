@@ -103,8 +103,6 @@ exports.updatePost = async (req,res,next) => {
         const category=req.body.category;
         const date=req.body.date;
         const rate=req.body.rate;
-
-        console.log(content);
         const post = await Post.findById(postId);
         if(post===null)
             return res.status(423).send('this post does not exists');

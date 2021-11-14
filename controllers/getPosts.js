@@ -47,6 +47,18 @@ exports.getAll = async (req,res,next) => {
     }
 };
 
+exports.getBooked = async (req,res,next) => {
+    try{
+        const userId = req.userId;
+        const user = await User.findById(userId).populate('registeredEvents');
+        return res.status(200).send(user.registeredEvents);
+    }catch(err){
+        if(!err.statusCode)
+            err.statusCode=500;
+        next(err);
+    }
+};
+
 exports.getPost = async (req,res,next) => {
     const postId = req.params.postId;
     try{
@@ -57,6 +69,16 @@ exports.getPost = async (req,res,next) => {
         if(!user.isCreator)
             return res.status(402).send('not a verified creator');
 
+        if(req.userId===null)
+            return res.status(200).send(post);
+        const curUser = await User.findById(req.userId);
+        for(let i=0;i<curUser.ratedEvents.length;++i){
+            let ratedEventId = String(String(curUser.ratedEvents[i]).split(',')[0]);
+                if(ratedEventId===String(postId)){
+                    var rating = Number(String(curUser.ratedEvents[i]).split(',')[1]);
+                    return res.status(200).json({post:post,rating:rating});
+                }
+        }
         return res.status(200).send(post);
     }catch(err){
         if(!err.statusCode)
@@ -163,7 +185,6 @@ exports.ratings = async (req,res,next) => {
                     if(ratedEventId===String(postId)){
                         await User.findByIdAndUpdate(userId,{$pull:{ratedEvents:user.ratedEvents[i]}});
                         var prevRating = Number(String(user.ratedEvents[i]).split(',')[1]);
-                        console.log(prevRating);
                         var sum = post.sumOfRatings-prevRating+rating;
                         var final = Number(sum/post.noOfRatings);
                         await Post.findByIdAndUpdate(postId,{$set:{
