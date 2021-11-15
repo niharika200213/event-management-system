@@ -61,6 +61,7 @@ exports.getBooked = async (req,res,next) => {
 
 exports.getPost = async (req,res,next) => {
     const postId = req.params.postId;
+    var rating=0;
     try{
         const post = await Post.findById(postId);
         if(!post)
@@ -70,16 +71,16 @@ exports.getPost = async (req,res,next) => {
             return res.status(402).send('not a verified creator');
 
         if(req.userId===null)
-            return res.status(200).send(post);
+            return res.status(200).send({post:post,rating:rating});
         const curUser = await User.findById(req.userId);
         for(let i=0;i<curUser.ratedEvents.length;++i){
             let ratedEventId = String(String(curUser.ratedEvents[i]).split(',')[0]);
                 if(ratedEventId===String(postId)){
-                    var rating = Number(String(curUser.ratedEvents[i]).split(',')[1]);
-                    return res.status(200).json({post:post,rating:rating});
+                    rating = Number(String(curUser.ratedEvents[i]).split(',')[1]);
+                    return res.status(200).send({post:post,rating:rating});
                 }
         }
-        return res.status(200).send(post);
+        return res.status(200).send({post:post,rating:rating});
     }catch(err){
         if(!err.statusCode)
             err.statusCode=500;

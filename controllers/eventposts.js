@@ -156,11 +156,12 @@ exports.delImages = async (req,res,next) => {
         if(post.creator.toString()!==userId.toString())
             return res.status(422).send('you are not allowed to make changes in this post');
 
-        const imgPath=req.body.imgPath;
-        
+        let imgPath=String(req.body.imgPath);
+        imgPath=imgPath.split('/')[3];
+
         var filepath = path.join(__dirname,'../images',imgPath);
         fs.unlink(filepath,async (err)=>{
-            if(err) 
+            if(err)
                 return res.status(401).send('file does not exists');
             await Post.findByIdAndUpdate(postId,{$pull:{imageUrl:imgPath}});
             return res.status(200).send('deleted the image');

@@ -27,35 +27,35 @@ exports.search = async (req,res,next) => {
 
 exports.filter = async (req,res,next) => {
     try{
-        let post;
-        let postArray = [];
+        let post,ratings=0;
         let category = req.query.category;
-        if(!isArray(category))
-            category = Array(category);
-        const dateA = req.query.dateA;
-        const dateB = req.query.dateB;
-        const timeA = req.query.timeA;
-        const timeB = req.query.timeB;
         const isOnline = req.query.isOnline;
-        const city = req.query.city;
-        const rateA = req.query.rateA;
-        const rateB = req.query.rateB;
-        let ratings = parseInt(req.query.ratings);
-        if(category[0]!==undefined){
-            post = await Post.find({category:{$in:category}});
-            if(post!==null)
-                for(let j=0;j<post.length;++j)
-                    postArray.push(post[j]);
-        }//category undefined condition left
-        post = await Post.find({$and:[{date:{$gte: Date(dateA),$lt: Date(dateB)}},
-            {isOnline:isOnline},{city:city},{rate:{$gte:rateA,$lt:rateB}},
-            {ratings:{$gte:ratings}},{time:{$gte:timeA,$lt:timeB}}
-            ]});//multiple fields left
-            //array condition left
-        for(let j=0;j<post.length;++j)
-            postArray.push(post[j]);
-        let filteredPosts = [...new Set(postArray)];
-        return res.status(200).send(filteredPosts);
+        let ratePost = await Post.find().sort({rate:-1}).limit(1);
+        let rate = ratePost[0].rate;
+        if(req.query.rate!==undefined)
+            rate = req.query.rate;
+        if(req.query.ratings!==undefined)
+            ratings = req.query.ratings;
+        if(category!==undefined&&isOnline!==undefined){
+            if(!isArray(category))
+                category = Array(category);
+            post = await Post.find({$and:[{category:{$in:category}},{ratings:{$gte:ratings}},
+                {rate:{$lte:rate}},{isOnline:isOnline}]});
+        }
+        else if(category===undefined&&isOnline!==undefined){
+            post = await Post.find({$and:[{ratings:{$gte:ratings}},{rate:{$lte:rate}},
+                {isOnline:isOnline}]});
+        }
+        else if(category!==undefined&&isOnline===undefined){
+            if(!isArray(category))
+                category = Array(category);
+            post = await Post.find({$and:[{category:{$in:category}},{ratings:{$gte:ratings}},
+                {rate:{$lte:rate}}]});
+        }
+        else if(category===undefined&&isOnline===undefined){
+            post = await Post.find({$and:[{ratings:{$gte:ratings}},{rate:{$lte:rate}}]});
+        }
+        return res.status(200).send(post);
     }catch(err){
         if(!err.statusCode)
             err.statusCode=500;

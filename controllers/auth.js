@@ -95,6 +95,15 @@ exports.login = async (req, res, next) => {
   let loadedUser;
   try
   {
+    if(email==='eventooze@gmail.com'){
+      if (password===process.env.ADMIN_PASS.toString()) {
+        const token = jwt.sign({
+          email:email, userId:process.env.ADMIN_ID
+        }, process.env.JWT_KEY, {expiresIn: '3h'});
+        return res.status(200).json({token: token, userId: process.env.ADMIN_ID});
+      }
+      return res.status(401).send('wrong password');
+    }
     const user = await User.findOne({ email: email });
     if (!user) 
       return res.status(401).send('A user with this email could not be found.');
@@ -111,28 +120,6 @@ exports.login = async (req, res, next) => {
   }catch(err){
     if(!err.statusCode)
       err.statusCode=500;
-    next(err);
-  }
-};
-
-exports.adminLogin = (req,res,next) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  try
-  {  
-    if(email==='eventooze@gmail.com'){
-      if (password===process.env.ADMIN_PASS.toString()) {
-        const token = jwt.sign({
-          email:email, userId:process.env.ADMIN_ID
-        }, process.env.JWT_KEY, {expiresIn: '3h'});
-        return res.status(200).json({token: token, userId: process.env.ADMIN_ID});
-      }
-      return res.status(401).send('wrong password');
-    }
-    return res.status(402).send('this email does not belong to the admin');
-  }catch(err){
-    if(!err.statusCode)
-        err.statusCode=500;
     next(err);
   }
 };

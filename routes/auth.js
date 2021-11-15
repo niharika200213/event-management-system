@@ -75,8 +75,6 @@ router.put('/signup/verify',
 
 router.put('/login', authController.login);
 
-router.put('/adminLogin', authController.adminLogin);
-
 router.put('/resetpass', [
   body('email')
     .isEmail()
