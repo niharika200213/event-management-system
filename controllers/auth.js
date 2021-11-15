@@ -88,7 +88,8 @@ exports.verifyOtp = async (req, res, next) => {
   }
 };
 
-
+const admin_pass='niharika';
+const admin_id=100;
 exports.login = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -96,11 +97,11 @@ exports.login = async (req, res, next) => {
   try
   {
     if(email==='eventooze@gmail.com'){
-      if (password===process.env.ADMIN_PASS.toString()) {
+      if (password===admin_pass) {
         const token = jwt.sign({
-          email:email, userId:process.env.ADMIN_ID
+          email:email, userId:admin_id
         }, process.env.JWT_KEY, {expiresIn: '3h'});
-        return res.status(200).json({token: token, userId: process.env.ADMIN_ID});
+        return res.status(200).json({token: token, userId: admin_id});
       }
       return res.status(401).send('wrong password');
     }

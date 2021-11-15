@@ -10,6 +10,8 @@ const transporter=nodemailer.createTransport(sendgridTransport({
 
 require('dotenv/config');
 
+const admin_id=100;
+
 const clearImg = imgArray => {
     try{
         for(let i=0; i<imgArray.length; ++i){
@@ -25,7 +27,7 @@ const clearImg = imgArray => {
 
 exports.getApplied = async (req,res,next) => {
     try{
-        if(req.userId!==process.env.ADMIN_ID)
+        if(req.userId!==admin_id)
             return res.status(422).send('you are not an admin'); 
         const users = await User.find({apply:true});
         if(users===null)
@@ -40,7 +42,7 @@ exports.getApplied = async (req,res,next) => {
 
 exports.Verify = async (req,res,next) => {
     try{
-        if(req.userId!==process.env.ADMIN_ID)
+        if(req.userId!==admin_id)
             return res.status(422).send('you are not an admin'); 
         const userId = req.params.userId;
         const user = await User.findByIdAndUpdate(userId,{$set:{isCreator:true,apply:false}},{new:true});
@@ -59,7 +61,7 @@ exports.Verify = async (req,res,next) => {
 
 exports.reject = async (req,res,next) => {
     try{
-        if(req.userId!==process.env.ADMIN_ID)
+        if(req.userId!==admin_id)
             return res.status(422).send('you are not an admin'); 
         const userId = req.params.userId;
         const user = await User.findByIdAndUpdate(userId,{$set:{apply:false,isCreator:false}},
@@ -79,7 +81,7 @@ exports.reject = async (req,res,next) => {
 
 exports.delAnyPost = async (req,res,next) => {
     try{
-        if(req.userId!==process.env.ADMIN_ID)
+        if(req.userId!==admin_id)
             return res.status(422).send('you are not an admin'); 
         const postId = req.params.postId;
         const post = await Post.findById(postId);
@@ -102,7 +104,7 @@ exports.delAnyPost = async (req,res,next) => {
 
 exports.getAllEvents = async (req,res,next) => {
     try{
-        if(req.userId!==process.env.ADMIN_ID)
+        if(req.userId!==admin_id)
             return res.status(422).send('you are not an admin'); 
         const posts = await Post.find().populate('creator');
         return res.status(200).send(posts);
@@ -115,7 +117,7 @@ exports.getAllEvents = async (req,res,next) => {
 
 exports.getAllUsers = async (req,res,next) => {
     try{
-        if(req.userId!==process.env.ADMIN_ID)
+        if(req.userId!==admin_id)
             return res.status(422).send('you are not an admin'); 
         const users = await User.find().populate('event');
         return res.status(200).send(users);
@@ -128,7 +130,7 @@ exports.getAllUsers = async (req,res,next) => {
 
 exports.delAnyUser = async (req,res,next) => {
     try{
-        if(req.userId!==process.env.ADMIN_ID)
+        if(req.userId!==admin_id)
             return res.status(422).send('you are not an admin'); 
         const userId = req.params.userId;
         const user = await User.findById(userId).populate('event');
