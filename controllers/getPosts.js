@@ -19,11 +19,7 @@ exports.getCreated = async (req,res,next) => {
             var post = await Post.findById(postId);
             postArray.push(post);
         }
-        if(!isEmpty(postArray))
             return res.status(200).json(postArray);
-        else
-            return res.status(401).send('you have not created any events');
-        
     }catch(err){
         if(!err.statusCode)
             err.statusCode=500;
