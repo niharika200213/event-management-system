@@ -1,5 +1,4 @@
 const multer = require('multer');
-const path=require('path');
 
 const imageFilter = function(req, file, cb) {
     if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG)$/)) {
@@ -11,7 +10,7 @@ const imageFilter = function(req, file, cb) {
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.resolve(__dirname, 'images'));
+        cb(null, '../images');
       },
     filename: function (req, file, cb) {
         cb(null, String(Date.now()+file.originalname.replace(' ','-')));
