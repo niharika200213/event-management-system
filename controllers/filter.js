@@ -73,7 +73,7 @@ exports.getUserDetails = async (req,res,next) => {
             user.populate('bookmarked');
         if(!isEmpty(user.registeredEvents))
             user.populate('registeredEvents');
-        return res.status(200).send(user);
+        return res.status(200).json({user:user,letter:String(user.name).split('')[0]});
     }catch(err){
         if(!err.statusCode)
             err.statusCode=500;
