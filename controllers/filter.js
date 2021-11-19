@@ -5,7 +5,6 @@ const User = require('../models/user');
 exports.search = async (req,res,next) => {
     try{
         const exp = req.body.exp;
-        console.log(exp);
         const posts = await Post.find({$or:
             [{title:{$regex: `${exp}`, $options: 'i'}},
             {content:{$regex: `${exp}`, $options: 'i'}},
