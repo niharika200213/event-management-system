@@ -3,6 +3,7 @@ const User = require('../models/user');
 const nodemailer=require('nodemailer');
 const sendgridTransport=require('nodemailer-sendgrid-transport');
 const { isEmpty } = require('lodash');
+const { ObjectID } = require('bson');
 const transporter=nodemailer.createTransport(sendgridTransport({
     auth:{api_key: process.env.API_KEY}
   }));
@@ -111,7 +112,8 @@ exports.bookmark = async (req,res,next) => {
 
         const user = await User.findById(userId);
         for(let i=0;i<user.bookmarked.length;++i){
-            if(user.bookmarked[i]===postId)
+            console.log(String(user.bookmarked[i]))
+            if(String(user.bookmarked[i])===postId)
                 return res.status(201).send('already bookmarked');
         }
         await user.bookmarked.push(postId);
