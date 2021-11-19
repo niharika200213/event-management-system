@@ -151,6 +151,11 @@ exports.register = async (req,res,next) => {
             return res.status(402).send('cannot book unverified event');
 
         const user = await User.findById(userId);
+        for(let i=0;i<user.registeredEvents.length;++i){
+            console.log(String(user.registeredEvents[i]))
+            if(String(user.registeredEvents[i])===postId)
+                return res.status(201).send('already registered');
+        }
         await user.registeredEvents.push(postId);
         await user.save();
         transporter.sendMail({
