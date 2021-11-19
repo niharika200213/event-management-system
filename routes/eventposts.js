@@ -27,7 +27,7 @@ router.get('/book', isAuth, getEventsController.getBooked);
 router.get('/createdEvents', isAuth, getEventsController.getCreated);
 router.patch('/rating/:postId', isAuth, getEventsController.ratings);
 
-router.get('/eventSearch', filterController.search);
+router.put('/eventSearch', filterController.search);
 router.get('/filtered', filterController.filter);
 router.get('/dashboard', isAuth, filterController.getUserDetails);
 
