@@ -89,8 +89,6 @@ exports.getBookmark = async (req,res,next) => {
     try{
         const userId = req.userId;
         const user = await User.findById(userId).populate('bookmarked');
-        if(isEmpty(user.bookmarked))
-            return res.status(401).send('no events bookmarked');
         return res.status(200).send(user.bookmarked);
     }catch(err){
         if(!err.statusCode)
