@@ -110,6 +110,10 @@ exports.bookmark = async (req,res,next) => {
             return res.status(402).send('cannot bookmark unverified event');
 
         const user = await User.findById(userId);
+        for(let i=0;i<user.bookmarked.length;++i){
+            if(user.bookmarked[i]===postId)
+                return res.status(201).send('already bookmarked');
+        }
         await user.bookmarked.push(postId);
         await user.save();
         return res.status(200).send('added to favourites');
