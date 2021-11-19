@@ -5,6 +5,7 @@ const User = require('../models/user');
 exports.search = async (req,res,next) => {
     try{
         const exp = req.body.exp;
+        console.log(exp);
         const posts = await Post.find({$or:
             [{title:{$regex: `${exp}`, $options: 'i'}},
             {content:{$regex: `${exp}`, $options: 'i'}},
@@ -32,27 +33,27 @@ exports.filter = async (req,res,next) => {
         const isOnline = req.query.isOnline;
         let ratePost = await Post.find().sort({rate:-1}).limit(1);
         let rate = ratePost[0].rate;
-        if(req.query.rate!==undefined)
+        if(req.query.rate!==undefined&&req.query.rate!==null)
             rate = req.query.rate;
-        if(req.query.ratings!==undefined)
+        if(req.query.ratings!==undefined&&req.query.ratings!==null)
             ratings = req.query.ratings;
-        if(category!==undefined&&isOnline!==undefined){
+        if(category!==undefined&&isOnline!==undefined&&category!==null&&isOnline!==null){
             if(!isArray(category))
                 category = Array(category);
             post = await Post.find({$and:[{category:{$in:category}},{ratings:{$gte:ratings}},
                 {rate:{$lte:rate}},{isOnline:isOnline}]});
         }
-        else if(category===undefined&&isOnline!==undefined){
+        else if((category===undefined||category===null)&&(isOnline!==undefined&&isOnline!==null)){
             post = await Post.find({$and:[{ratings:{$gte:ratings}},{rate:{$lte:rate}},
                 {isOnline:isOnline}]});
         }
-        else if(category!==undefined&&isOnline===undefined){
+        else if((category!==undefined&&category!==null)&&(isOnline===undefined||isOnline===null)){
             if(!isArray(category))
                 category = Array(category);
             post = await Post.find({$and:[{category:{$in:category}},{ratings:{$gte:ratings}},
                 {rate:{$lte:rate}}]});
         }
-        else if(category===undefined&&isOnline===undefined){
+        else if((category===undefined||category===null)&&(isOnline===undefined||isOnline===null)){
             post = await Post.find({$and:[{ratings:{$gte:ratings}},{rate:{$lte:rate}}]});
         }
         return res.status(200).send(post);
