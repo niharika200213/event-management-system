@@ -46,6 +46,8 @@ exports.Verify = async (req,res,next) => {
             return res.status(422).send('you are not an admin'); 
         const userId = req.params.userId;
         const user = await User.findByIdAndUpdate(userId,{$set:{isCreator:true,apply:false}},{new:true});
+        if(!user)
+            return res.status(201).send('user not found');
         transporter.sendMail({
             to: user.email, from: 'eventooze@gmail.com',
             subject: 'verified', html: '<h1>You are now a verified creator.</h1>'
@@ -65,6 +67,8 @@ exports.reject = async (req,res,next) => {
         const userId = req.params.userId;
         const user = await User.findByIdAndUpdate(userId,{$set:{apply:false,isCreator:false}},
             {new:true});
+        if(!user)
+            return res.status(201).send('user not found');
         transporter.sendMail({
             to: user.email, from: 'eventooze@gmail.com',
             subject: 'rejected', html: '<h1>Your verification request was rejected.</h1>'
