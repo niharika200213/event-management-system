@@ -110,7 +110,6 @@ exports.bookmark = async (req,res,next) => {
 
         const user = await User.findById(userId);
         for(let i=0;i<user.bookmarked.length;++i){
-            console.log(String(user.bookmarked[i]))
             if(String(user.bookmarked[i])===postId)
                 return res.status(201).send('already bookmarked');
         }
@@ -152,7 +151,6 @@ exports.register = async (req,res,next) => {
 
         const user = await User.findById(userId);
         for(let i=0;i<user.registeredEvents.length;++i){
-            console.log(String(user.registeredEvents[i]))
             if(String(user.registeredEvents[i])===postId)
                 return res.status(201).send('already registered');
         }
