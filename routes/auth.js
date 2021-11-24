@@ -73,7 +73,7 @@ router.put('/signup/verify',
     .withMessage('please enter a valid name')
 ], authController.verifyOtp);
 
-router.put('/login', authController.login);
+router.put('/login', [body('email').normalizeEmail()], authController.login);
 
 router.put('/resetpass', [
   body('email')
