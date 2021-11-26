@@ -29,7 +29,7 @@ exports.getApplied = async (req,res,next) => {
     try{
         if(req.userId!==admin_id)
             return res.status(422).send('you are not an admin'); 
-        const users = await User.find({apply:true});
+        const users = await User.find({apply:true}).select('-password');
         if(users===null)
             return res.status(401).send('no users to verify'); 
         return res.status(200).send(users);
@@ -45,7 +45,7 @@ exports.Verify = async (req,res,next) => {
         if(req.userId!==admin_id)
             return res.status(422).send('you are not an admin'); 
         const userId = req.params.userId;
-        const user = await User.findByIdAndUpdate(userId,{$set:{isCreator:true,apply:false}},{new:true});
+        const user = await User.findByIdAndUpdate(userId,{$set:{isCreator:true,apply:false}},{new:true}).select('-password');
         if(!user)
             return res.status(201).send('user not found');
         transporter.sendMail({
@@ -121,7 +121,7 @@ exports.getAllUsers = async (req,res,next) => {
     try{
         if(req.userId!==admin_id)
             return res.status(422).send('you are not an admin'); 
-        const users = await User.find().populate('event');
+        const users = await User.find().populate('event').select('-password');
         return res.status(200).send(users);
     }catch(err){
         if(!err.statusCode)
