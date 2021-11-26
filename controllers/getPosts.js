@@ -67,6 +67,8 @@ exports.getPost = async (req,res,next) => {
         if(!user.isCreator)
             if(user===req.userId)
                 return res.status(200).send({post:post});
+            else 
+                return res.status(401).send('not a verified post');
 
         if(req.userId===null)
             return res.status(200).send({post:post,rating:rating});
