@@ -13,7 +13,6 @@ module.exports = async (req, res, next) => {
         decodedToken = jwt.verify(token, process.env.JWT_KEY);
       } catch (err) {
         req.userId=null;
-        console.log(err);
       }
       if (!decodedToken) {
         req.userId=null;

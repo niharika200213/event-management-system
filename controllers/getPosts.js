@@ -65,7 +65,8 @@ exports.getPost = async (req,res,next) => {
             return res.status(401).send('the event does not exists');
         const user = await User.findById(post.creator);
         if(!user.isCreator)
-            return res.status(402).send('not a verified creator');
+            if(user===req.userId)
+                return res.status(200).send({post:post});
 
         if(req.userId===null)
             return res.status(200).send({post:post,rating:rating});
