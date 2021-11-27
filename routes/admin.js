@@ -4,6 +4,7 @@ const router = express.Router();
 const isAuth = require('../middleware/is-auth');
 
 router.get('/view', isAuth, adminController.getApplied);
+router.get('/event/:postId', isAuth, adminController.getOneEvent);
 router.put('/reject/:userId', isAuth, adminController.reject);
 router.put('/verify/:userId', isAuth, adminController.Verify);
 router.delete('/delete/:postId', isAuth, adminController.delAnyPost);

@@ -57,23 +57,23 @@ exports.getBooked = async (req,res,next) => {
 };
 
 exports.getPost = async (req,res,next) => {
-    const postId = req.params.postId;
-    var rating=0;
     try{
+        const postId = req.params.postId;
+        const curUserId = req.userId; 
+        var rating=0;
         const post = await Post.findById(postId);
         if(!post)
             return res.status(401).send('the event does not exists');
         const user = await User.findById(post.creator);
         if(!user.isCreator){
-            if(String(user._id)===String(req.userId)||req.userId===100)
+            if(user._id===curUserId)
                 return res.status(200).send({post:post});
             else 
                 return res.status(401).send('not a verified post');
         }
-
-        else if(req.userId===null)
+        else if(curUserId===null)
             return res.status(200).send({post:post,rating:rating});
-        const curUser = await User.findById(req.userId);
+        const curUser = await User.findById(curUserId);
         for(let i=0;i<curUser.ratedEvents.length;++i){
             let ratedEventId = String(String(curUser.ratedEvents[i]).split(',')[0]);
                 if(ratedEventId===String(postId)){

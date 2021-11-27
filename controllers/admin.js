@@ -150,3 +150,19 @@ exports.delAnyUser = async (req,res,next) => {
         next(err);
     }
 };
+
+exports.getOneEvent = async (req,res,next) => {
+    try{
+        if(req.userId!==admin_id)
+            return res.status(422).send('you are not an admin'); 
+        const postId = req.params.postId;
+        const post = await Post.findById(postId);
+        if(!post)
+            return res.status(400).send('the event does not exists');
+        return res.status(200).send({post:post});
+    }catch(err){
+        if(!err.statusCode)
+            err.statusCode=500;
+        next(err);
+    }
+};
