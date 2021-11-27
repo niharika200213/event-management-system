@@ -64,13 +64,14 @@ exports.getPost = async (req,res,next) => {
         if(!post)
             return res.status(401).send('the event does not exists');
         const user = await User.findById(post.creator);
-        if(!user.isCreator)
+        if(!user.isCreator){
             if(String(user._id)===String(req.userId)||req.userId===100)
                 return res.status(200).send({post:post});
             else 
                 return res.status(401).send('not a verified post');
+        }
 
-        if(req.userId===null)
+        else if(req.userId===null)
             return res.status(200).send({post:post,rating:rating});
         const curUser = await User.findById(req.userId);
         for(let i=0;i<curUser.ratedEvents.length;++i){
