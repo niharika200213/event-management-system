@@ -14,7 +14,7 @@ app.use(express.urlencoded({extended:true}));
 
 app.use(cors({
   origin: "*",
-  methods: ['GET','POST','PUT','DELETE']
+  methods: ['GET','POST','PUT','DELETE', 'PATCH']
 }));
 app.use('/auth',authRoutes);
 app.use('/post',postRoutes);
