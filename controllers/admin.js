@@ -49,7 +49,7 @@ exports.Verify = async (req,res,next) => {
         if(!user)
             return res.status(201).send('user not found');
         transporter.sendMail({
-            to: user.email, from: 'eventooze@gmail.com',
+            to: user.email, from: 'kyabaathai21@gmail.com',
             subject: 'verified', html: '<h1>You are now a verified creator.</h1>'
           });
         return res.status(200).send(user);
@@ -70,7 +70,7 @@ exports.reject = async (req,res,next) => {
         if(!user)
             return res.status(201).send('user not found');
         transporter.sendMail({
-            to: user.email, from: 'eventooze@gmail.com',
+            to: user.email, from: 'kyabaathai21@gmail.com',
             subject: 'rejected', html: '<h1>Your verification request was rejected.</h1>'
           });
         return res.status(200).send('rejected, apply again');

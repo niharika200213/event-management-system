@@ -35,7 +35,7 @@ exports.resetpass = async (req, res, next) => {
       await OTP.updateOne({email: email}, {$set: {otp: hashed_otp}});
       
     transporter.sendMail({
-      to: email, from: 'eventooze@gmail.com',
+      to: email, from: 'kyabaathai21@gmail.com',
       subject: 'Verify', html: `<h1>OTP IS HERE: ${otp}</h1>`
     });
     return res.status(200).send('otp sent successfully');
