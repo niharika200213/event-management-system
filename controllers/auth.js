@@ -10,7 +10,7 @@ const mailServiceInfo = nodemailer.createTransport({
   service:'gmail',
   host:'smtp.gmail.com',
   port:'465',
-  ssl=true,
+  ssl:'true',
   auth:{
     user:'eventooze@gmail.com',
     pass:'Eventooze1234@'
