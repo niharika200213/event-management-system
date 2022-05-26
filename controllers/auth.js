@@ -9,8 +9,6 @@ const transporter=nodemailer.createTransport(sendgridTransport({
   auth:{api_key: process.env.API_KEY}
 }));
 
-require('dotenv/config');
-
 const User = require('../models/user');
 const OTP = require('../models/otp');
 
