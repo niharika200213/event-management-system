@@ -13,7 +13,7 @@ const mailServiceInfo = nodemailer.createTransport({
   ssl:'true',
   auth:{
     user:'eventooze@gmail.com',
-    pass:'Eventooze1234@'
+    pass:'lgfeudymvdfnywnc'
   }
 });
 // const transporter=nodemailer.createTransport(sendgridTransport({
