@@ -9,6 +9,9 @@ const mailServiceInfo = nodemailer.createTransport({
   auth:{
     user:'eventooze@gmail.com',
     pass:process.env.EMAIL_PASSWORD
+  },
+  tls:{
+      rejectUnauthorized: false
   }
 });
 
