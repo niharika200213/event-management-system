@@ -1,15 +1,7 @@
 const bcrypt = require('bcryptjs');
-const nodemailer=require('nodemailer');
+const mail=require('../middleware/mail');
 const { validationResult } = require('express-validator');
 const otpgenerator=require('otp-generator'); 
-
-const mailServiceInfo = nodemailer.createTransport({
-  service:'gmail',
-  auth:{
-    user:'eventooze@gmail.com',
-    pass:process.env.EMAIL_PASSWORD
-  }
-});
 
 const User = require('../models/user');
 const OTP = require('../models/otp');
@@ -36,15 +28,7 @@ exports.resetpass = async (req, res, next) => {
     else
       await OTP.updateOne({email: email}, {$set: {otp: hashed_otp}});
     
-    mailServiceInfo.sendMail({
-      to: email, from: 'eventooze@gmail.com',
-      subject: 'Verify', html: `<h1>OTP IS HERE: ${otp}</h1>`
-    }, function(err, info){
-      if(err)
-        console.log(err)
-      else
-        console.log(info)
-    });
+    mail(email, 'Verify', `<h1>OTP IS HERE: ${otp}</h1>`);
     
     return res.status(200).send('otp sent successfully');
   }catch(err){

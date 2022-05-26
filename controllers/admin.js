@@ -2,14 +2,7 @@ const Post = require('../models/events');
 const path = require('path');
 const fs = require('fs');
 const User = require('../models/user');
-const nodemailer=require('nodemailer');
-const mailServiceInfo = nodemailer.createTransport({
-    service:'gmail',
-    auth:{
-      user:'eventooze@gmail.com',
-      pass:process.env.EMAIL_PASSWORD
-    }
-  });
+const mail=require('../middleware/mail');
 
 const admin_id=100;
 
@@ -49,15 +42,7 @@ exports.Verify = async (req,res,next) => {
         const user = await User.findByIdAndUpdate(userId,{$set:{isCreator:true,apply:false}},{new:true}).select('-password');
         if(!user)
             return res.status(201).send('user not found');
-        mailServiceInfo.sendMail({
-            to: user.email, from: 'eventooze@gmail.com',
-            subject: 'verified', html: '<h1>You are now a verified creator.</h1>'
-            }, function(err, info){
-            if(err)
-                console.log(err)
-            else
-                console.log(info)
-        });
+        mail(user.email, 'verified', '<h1>You are now a verified creator.</h1>');
         return res.status(200).send(user);
     }catch(err){
         if(!err.statusCode)
@@ -75,15 +60,7 @@ exports.reject = async (req,res,next) => {
             {new:true});
         if(!user)
             return res.status(201).send('user not found');
-        mailServiceInfo.sendMail({
-            to: user.email, from: 'eventooze@gmail.com',
-            subject: 'rejected', html: '<h1>Your verification request was rejected.</h1>'
-            }, function(err, info){
-            if(err)
-                console.log(err)
-            else
-                console.log(info)
-        });
+        mail(user.email, 'rejected','<h1>Your verification request was rejected.</h1>');
         return res.status(200).send('rejected, apply again');
     }catch(err){
         if(!err.statusCode)

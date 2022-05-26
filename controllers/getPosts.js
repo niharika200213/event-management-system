@@ -1,14 +1,6 @@
 const Post = require('../models/events');
 const User = require('../models/user');
-const nodemailer=require('nodemailer');
-
-const mailServiceInfo = nodemailer.createTransport({
-    service:'gmail',
-    auth:{
-      user:'eventooze@gmail.com',
-      pass:process.env.EMAIL_PASSWORD
-    }
-});
+const mail=require('../middleware/mail');
 
 exports.getCreated = async (req,res,next) => {
     try{
@@ -160,16 +152,7 @@ exports.register = async (req,res,next) => {
         }
         await user.registeredEvents.push(postId);
         await user.save();
-        mailServiceInfo.sendMail({
-            to: email, from: 'eventooze@gmail.com',
-            subject: 'confirm booking', 
-            html: `<h1>your booking is confirmed for<br>${post.title}</h1>`
-          }, function(err, info){
-            if(err)
-              console.log(err)
-            else
-              console.log(info)
-        });
+        mail(email, 'confirm booking', `<h1>your booking is confirmed for<br>${post.title}</h1>`);
         return res.status(200).send('booked event');
     }catch(err){
         if(!err.statusCode)
