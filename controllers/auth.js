@@ -2,15 +2,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer=require('nodemailer');
 //const sendgridTransport=require('nodemailer-sendgrid-transport');
-const send = require('gmail-send');
 const { validationResult } = require('express-validator');
 const otpgenerator=require('otp-generator'); 
 
 const mailServiceInfo = nodemailer.createTransport({
   service:'gmail',
-  host:'smtp.gmail.com',
-  port:'465',
-  ssl:'true',
   auth:{
     user:'eventooze@gmail.com',
     pass:'lgfeudymvdfnywnc'
