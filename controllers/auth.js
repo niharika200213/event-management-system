@@ -47,6 +47,11 @@ exports.generate_otp = async (req, res, next) => {
     mailServiceInfo.sendMail({
       to: email, from: 'eventooze@gmail.com',
       subject: 'Verify', html: `<h1>OTP IS HERE: ${otp}</h1>`
+    }, function(err, info){
+      if(err)
+        console.log(err)
+      else
+        console.log(info)
     });
     return res.status(200).send('otp sent successfully');
   }catch(err){
