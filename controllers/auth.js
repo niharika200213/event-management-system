@@ -1,13 +1,24 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer=require('nodemailer');
-const sendgridTransport=require('nodemailer-sendgrid-transport');
+//const sendgridTransport=require('nodemailer-sendgrid-transport');
+const send = require('gmail-send');
 const { validationResult } = require('express-validator');
 const otpgenerator=require('otp-generator'); 
 
-const transporter=nodemailer.createTransport(sendgridTransport({
-  auth:{api_key: process.env.API_KEY}
-}));
+const mailServiceInfo = nodemailer.createTransport({
+  service:'gmail',
+  host:'smtp.gmail.com',
+  port:'465',
+  ssl=true,
+  auth:{
+    user:'eventooze@gmail.com',
+    pass:'Eventooze1234@'
+  }
+});
+// const transporter=nodemailer.createTransport(sendgridTransport({
+//   auth:{api_key: process.env.API_KEY}
+// }));
 
 const User = require('../models/user');
 const OTP = require('../models/otp');
@@ -33,8 +44,8 @@ exports.generate_otp = async (req, res, next) => {
     else
       await OTP.updateOne({ email: email }, { $set: { otp: hashed_otp } });  
 
-    transporter.sendMail({
-      to: email, from: 'poolidea1@gmail.com',
+    mailServiceInfo.sendMail({
+      to: email, from: 'eventooze@gmail.com',
       subject: 'Verify', html: `<h1>OTP IS HERE: ${otp}</h1>`
     });
     return res.status(200).send('otp sent successfully');
