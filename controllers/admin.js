@@ -3,12 +3,13 @@ const path = require('path');
 const fs = require('fs');
 const User = require('../models/user');
 const nodemailer=require('nodemailer');
-const sendgridTransport=require('nodemailer-sendgrid-transport');
-const transporter=nodemailer.createTransport(sendgridTransport({
-    auth:{api_key: process.env.API_KEY}
-  }));
-
-require('dotenv/config');
+const mailServiceInfo = nodemailer.createTransport({
+    service:'gmail',
+    auth:{
+      user:'eventooze@gmail.com',
+      pass:process.env.EMAIL_PASSWORD
+    }
+  });
 
 const admin_id=100;
 
@@ -48,10 +49,15 @@ exports.Verify = async (req,res,next) => {
         const user = await User.findByIdAndUpdate(userId,{$set:{isCreator:true,apply:false}},{new:true}).select('-password');
         if(!user)
             return res.status(201).send('user not found');
-        transporter.sendMail({
-            to: user.email, from: 'kyabaathai21@gmail.com',
+        mailServiceInfo.sendMail({
+            to: user.email, from: 'eventooze@gmail.com',
             subject: 'verified', html: '<h1>You are now a verified creator.</h1>'
-          });
+            }, function(err, info){
+            if(err)
+                console.log(err)
+            else
+                console.log(info)
+        });
         return res.status(200).send(user);
     }catch(err){
         if(!err.statusCode)
@@ -69,10 +75,15 @@ exports.reject = async (req,res,next) => {
             {new:true});
         if(!user)
             return res.status(201).send('user not found');
-        transporter.sendMail({
-            to: user.email, from: 'kyabaathai21@gmail.com',
+        mailServiceInfo.sendMail({
+            to: user.email, from: 'eventooze@gmail.com',
             subject: 'rejected', html: '<h1>Your verification request was rejected.</h1>'
-          });
+            }, function(err, info){
+            if(err)
+                console.log(err)
+            else
+                console.log(info)
+        });
         return res.status(200).send('rejected, apply again');
     }catch(err){
         if(!err.statusCode)

@@ -1,14 +1,14 @@
 const Post = require('../models/events');
 const User = require('../models/user');
 const nodemailer=require('nodemailer');
-const sendgridTransport=require('nodemailer-sendgrid-transport');
-const { isEmpty } = require('lodash');
-const { ObjectID } = require('bson');
-const transporter=nodemailer.createTransport(sendgridTransport({
-    auth:{api_key: process.env.API_KEY}
-  }));
 
-require('dotenv/config');
+const mailServiceInfo = nodemailer.createTransport({
+    service:'gmail',
+    auth:{
+      user:'eventooze@gmail.com',
+      pass:process.env.EMAIL_PASSWORD
+    }
+});
 
 exports.getCreated = async (req,res,next) => {
     try{
@@ -160,10 +160,16 @@ exports.register = async (req,res,next) => {
         }
         await user.registeredEvents.push(postId);
         await user.save();
-        transporter.sendMail({
+        mailServiceInfo.sendMail({
             to: email, from: 'eventooze@gmail.com',
-            subject: 'confirm booking', html: `<h1>your booking is confirmed for<br>${post.title}</h1>`
-          });
+            subject: 'confirm booking', 
+            html: `<h1>your booking is confirmed for<br>${post.title}</h1>`
+          }, function(err, info){
+            if(err)
+              console.log(err)
+            else
+              console.log(info)
+        });
         return res.status(200).send('booked event');
     }catch(err){
         if(!err.statusCode)

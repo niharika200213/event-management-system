@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer=require('nodemailer');
-//const sendgridTransport=require('nodemailer-sendgrid-transport');
 const { validationResult } = require('express-validator');
 const otpgenerator=require('otp-generator'); 
 
@@ -9,12 +8,9 @@ const mailServiceInfo = nodemailer.createTransport({
   service:'gmail',
   auth:{
     user:'eventooze@gmail.com',
-    pass:'lgfeudymvdfnywnc'
+    pass:process.env.EMAIL_PASSWORD
   }
 });
-// const transporter=nodemailer.createTransport(sendgridTransport({
-//   auth:{api_key: process.env.API_KEY}
-// }));
 
 const User = require('../models/user');
 const OTP = require('../models/otp');
