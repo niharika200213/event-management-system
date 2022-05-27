@@ -6,8 +6,15 @@ const transporter=nodemailer.createTransport(sendgridTransport({
 }));
 
 module.exports = (email, subject, html) => {
-    transporter.sendMail({
-        to: email, from: 'learnatstuista@gmail.com',
-        subject: subject, html: html
-      });
+    try{
+        transporter.sendMail({
+            to: email, from: 'learnatstuista@gmail.com',
+            subject: subject, html: html
+          });
+    }
+    catch(err){
+        if(!err.statusCode)
+          err.statusCode=500;
+        next(err);
+    }
 }
