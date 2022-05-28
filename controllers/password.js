@@ -9,9 +9,10 @@ const OTP = require('../models/otp');
 exports.resetpass = async (req, res, next) => {
   if(!validationResult(req).isEmpty())
       return res.status(422).json('please enter a valid email');
-  const email = req.body.email;
+  
   try
   {
+    const email = req.body.email;
     const user = await User.findOne({ email: email });
     if (user===null)
       return res.status(401).send('User not found');
@@ -19,14 +20,13 @@ exports.resetpass = async (req, res, next) => {
     const otp=otpgenerator.generate(6, {digits:true, alphabets:false,
         upperCase:false, specialChars:false});
     
-    const hashed_otp = await bcrypt.hash(otp, 12);
     const result = await OTP.findOne({email: email});
     if(result===null){
-      const newOtp= new OTP({email: email, otp: hashed_otp});
+      const newOtp= new OTP({email: email, otp: otp});
       await newOtp.save();
     }
     else
-      await OTP.updateOne({email: email}, {$set: {otp: hashed_otp}});
+      await OTP.updateOne({email: email}, {$set: {otp: otp}});
     
     mail(email, 'Verify', `<h1>OTP IS HERE: ${otp}</h1>`);
     
@@ -41,15 +41,18 @@ exports.resetpass = async (req, res, next) => {
 exports.verify = async (req, res) => {
   if(!validationResult(req).isEmpty())
       return res.status(422).json('please enter a valid email');
-  const email = req.body.email;
-  const otp = req.body.otp;
+  
   try
   {
+    const email = req.body.email;
+    const otp = req.body.otp;
     const optInDb = await OTP.findOne({ email: email });
     if (optInDb === null)
       return res.status(401).send('otp expired');
 
-    const isEqual = await bcrypt.compare(otp, optInDb.otp);
+    let isEqual=false;
+    if(otp==optInDb.otp)
+      isEqual=true;
     if (!isEqual)
       return res.status(402).json('wrong otp');
 
@@ -67,10 +70,11 @@ exports.verify = async (req, res) => {
 exports.newpassword = async (req,res,next) => {
   if(!validationResult(req).isEmpty())
       return res.status(422).json('password must be atleast 8 characters long');
-  const newpass = req.body.newpass;
-  const email = req.body.email;
+  
   try
   {
+    const newpass = req.body.newpass;
+    const email = req.body.email;
     const otp = await OTP.findOne({email:email});
     if(otp===null){
       await User.updateOne({email:email}, {$set:{isVerified:false}});

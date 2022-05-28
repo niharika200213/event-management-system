@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 
 const otpSchema = new Schema({
   otp: {
-    type: String,
+    type: Number,
     required: true
   },
   email: {

@@ -8,7 +8,7 @@ const transporter=nodemailer.createTransport(sendgridTransport({
 module.exports = (email, subject, html) => {
     try{
         transporter.sendMail({
-            to: email, from: 'learnatstuista@gmail.com',
+            to: email, from: 'eventooze@gmail.com',
             subject: subject, html: html
           });
     }

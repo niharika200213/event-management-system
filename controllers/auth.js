@@ -11,22 +11,21 @@ exports.generate_otp = async (req, res, next) => {
     if(!validationResult(req).isEmpty())
       return res.status(422).json(validationResult(req).errors[0].msg);
 
-  const email = req.body.email;
-  const name = req.body.name;
-  const password = req.body.password;
   try
   {
+    const email = req.body.email;
+    const name = req.body.name;
+    const password = req.body.password;
     const otp=otpgenerator.generate(6, {digits:true, alphabets:false,
     upperCase:false, specialChars:false});
   
-    const hashed_otp = await bcrypt.hash(otp, 12);
     const result = await OTP.findOne({ email: email });
     if (result === null) {
-      const newOtp = new OTP({ email: email, otp: hashed_otp });
+      const newOtp = new OTP({ email: email, otp: otp });
       await newOtp.save();
     }
     else
-      await OTP.updateOne({ email: email }, { $set: { otp: hashed_otp } });  
+      await OTP.updateOne({ email: email }, { $set: { otp: otp } });  
 
     mail(email, 'verify', `<h1>OTP IS HERE: ${otp}</h1>`);
     return res.status(200).send('otp sent successfully');
@@ -40,12 +39,13 @@ exports.generate_otp = async (req, res, next) => {
 exports.verifyOtp = async (req, res, next) => {
   if(!validationResult(req).isEmpty())
     return res.status(422).json(validationResult(req).errors[0].msg);
-  const email = req.body.email;
-  const name = req.body.name;
-  const password = req.body.password;
-  const otp = req.body.otp;
+  
   try
   {
+    const email = req.body.email;
+    const name = req.body.name;
+    const password = req.body.password;
+    const otp = req.body.otp;
     const user = await User.findOne({ email: email });
     if (user)
         return res.status(401).send('Already verified.');
@@ -53,8 +53,9 @@ exports.verifyOtp = async (req, res, next) => {
     const otpHolder = await OTP.findOne({ email: email });
     if(otpHolder===null)
       return res.status(402).send('otp expired');
-
-    const validUser = await bcrypt.compare(otp, otpHolder.otp);
+    let validUser=false;
+    if(otp==otpHolder.otp)
+        validUser = true;
     if(otpHolder.email===email && validUser){
       const hashedPw = await bcrypt.hash(password, 12);
       const user = new User({

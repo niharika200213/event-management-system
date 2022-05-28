@@ -45,6 +45,7 @@
     "nodemailer": "^6.7.0",
     "nodemailer-sendgrid-transport": "^0.2.0",
     "otp-generator": "^3.0.0",
+    "sib-api-v3-sdk": "^8.3.0",
     "vercel": "^24.2.4"
   }
 }
